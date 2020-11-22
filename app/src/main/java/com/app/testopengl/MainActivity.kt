@@ -1,23 +1,31 @@
 package com.app.testopengl
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
+import com.app.testopengl.base.BaseActivity
+import com.app.testopengl.ui.activity.OpenGLPlayerActivity
+import com.app.testopengl.ui.activity.SimpleRenderActivity
+import com.blankj.utilcode.constant.PermissionConstants
+import com.blankj.utilcode.util.PermissionUtils
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    override fun getLayoutId(): Int = R.layout.activity_main
+
+    override fun initData() {
+        PermissionUtils.permission(PermissionConstants.STORAGE)
+            .request()
 
         // Example of a call to a native method
         sample_text.text = "${stringFromJNI()} ${stringFromJNI2()}"
+
+        btnDrawTriangle.setOnClickListener {
+            SimpleRenderActivity.start(mContext)
+        }
+        btnOpenGLPlayer.setOnClickListener {
+            OpenGLPlayerActivity.start(mContext)
+        }
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
     external fun stringFromJNI(): String
 
     external fun stringFromJNI2(): String
