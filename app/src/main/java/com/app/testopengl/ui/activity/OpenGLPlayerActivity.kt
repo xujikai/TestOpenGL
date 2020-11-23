@@ -30,6 +30,7 @@ class OpenGLPlayerActivity : BaseActivity() {
 
     override fun initData() {
         drawer = VideoDrawer()
+        drawer.setVideoSize(960, 528)
         drawer.getSurfaceTexture {
             initPlayer(Surface(it))
         }

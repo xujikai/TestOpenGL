@@ -8,4 +8,6 @@ interface IDrawer {
     fun release()
 
     fun getSurfaceTexture(cb: (st: SurfaceTexture) -> Unit) {}
+    fun setVideoSize(width: Int, height: Int) {}
+    fun setWorldSize(width: Int, height: Int) {}
 }
