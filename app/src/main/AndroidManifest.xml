@@ -21,6 +21,15 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.activity.BasicShapeActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.BasicLineActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.TextureActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.activity.SimpleRenderActivity"
             android:screenOrientation="portrait" />
         <activity
