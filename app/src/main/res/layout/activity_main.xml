@@ -27,5 +27,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="纹理的绘制"/>
+    <Button
+        android:id="@+id/btnDrawTriangle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="三角形的绘制"/>
+    <Button
+        android:id="@+id/btnDrawEgl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="EGL的绘制"/>
 
 </LinearLayout>
