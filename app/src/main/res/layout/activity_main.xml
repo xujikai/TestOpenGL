@@ -18,6 +18,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/btnRequestPermission"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请求权限"/>
+    <Button
         android:id="@+id/btnDrawPoint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,5 +42,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="EGL的绘制"/>
+    <Button
+        android:id="@+id/btnDrawCamera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Camera的预览"/>
 
 </LinearLayout>
