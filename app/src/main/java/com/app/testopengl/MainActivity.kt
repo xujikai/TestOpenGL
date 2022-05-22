@@ -39,5 +39,11 @@ class MainActivity : BaseActivity() {
         btnDrawCamera.setOnClickListener {
             CameraActivity.start(mContext)
         }
+        btnShowFFmpeg.setOnClickListener {
+            FFmpegActivity.start(mContext)
+        }
+        btnVideoRecorder.setOnClickListener {
+            VideoRecorderActivity.start(mContext)
+        }
     }
 }

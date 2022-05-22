@@ -35,6 +35,7 @@ struct NativeImage {
     int height;
     int format;
     uint8_t *ppPlane[3];
+    int pLineSize[3];
 
     NativeImage() {
         width = 0;
@@ -43,6 +44,9 @@ struct NativeImage {
         ppPlane[0] = nullptr;
         ppPlane[1] = nullptr;
         ppPlane[2] = nullptr;
+        pLineSize[0] = 0;
+        pLineSize[1] = 0;
+        pLineSize[2] = 0;
     }
 };
 

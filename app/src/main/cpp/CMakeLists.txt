@@ -10,15 +10,21 @@ cmake_minimum_required(VERSION 3.4.1)
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+set(jnilibs ${CMAKE_SOURCE_DIR}/../jniLibs)
+
 include_directories(
         glm
+        include
 )
+
+link_directories(${jnilibs}/${ANDROID_ABI})
 
 file(GLOB src-files
         ${CMAKE_SOURCE_DIR}/*.cpp
         ${CMAKE_SOURCE_DIR}/render/*.cpp
         ${CMAKE_SOURCE_DIR}/util/*.cpp
-        ${CMAKE_SOURCE_DIR}/sample/*.cpp)
+        ${CMAKE_SOURCE_DIR}/sample/*.cpp
+        ${CMAKE_SOURCE_DIR}/recorder/*.cpp)
 
 add_library( # Sets the name of the library.
         native-render
@@ -46,12 +52,29 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
+set(third-party-libs
+        avformat
+        avcodec
+        avfilter
+        swresample
+        swscale
+        avutil
+        fdk-aac
+        x264
+        )
+
+set(native-libs
+        EGL
+        GLESv3
+        OpenSLES
+        )
+
 target_link_libraries( # Specifies the target library.
         native-render
 
         # Links the target library to the log library
         # included in the NDK.
         ${log-lib}
-        EGL
-        GLESv3
-        android)
+        ${third-party-libs}
+        ${native-libs}
+        )
