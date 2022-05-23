@@ -110,6 +110,7 @@ void MediaCameraRender::Init(int videoWidth, int videoHeight, int *dstSize) {
 }
 
 void MediaCameraRender::RenderVideoFrame(NativeImage *pImage) {
+    LOGCATE("MediaCameraRender::RenderVideoFrame pImage=%p", pImage);
     if (pImage == nullptr || pImage->ppPlane[0] == nullptr) {
         return;
     }
@@ -118,6 +119,7 @@ void MediaCameraRender::RenderVideoFrame(NativeImage *pImage) {
         if (m_RenderImage.ppPlane[0] != nullptr) {
             NativeImageUtil::FreeNativeImage(&m_RenderImage);
         }
+        memset(&m_RenderImage, 0, sizeof(NativeImage));
         m_RenderImage.width = pImage->width;
         m_RenderImage.height = pImage->height;
         m_RenderImage.format = pImage->format;
@@ -255,8 +257,10 @@ void MediaCameraRender::OnDrawFrame() {
         sprintf(samplerName, "s_texture%d", i);
         GLUtils::setInt(m_FboProgramObj, samplerName, i);
     }
+//    GLUtils::setInt(m_FboProgramObj, "s_texture0", 0);
     GLUtils::setInt(m_FboProgramObj, "u_nImgType", m_RenderImage.format);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+    LOGCATE("MediaCameraRender::OnDrawFrame %d %d %d", m_RenderImage.width, m_RenderImage.height, m_RenderImage.format);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_DstFboId);
     glViewport(0, 0, m_RenderImage.height, m_RenderImage.width); // 相机的宽和高反了
@@ -284,6 +288,7 @@ void MediaCameraRender::OnDrawFrame() {
     GLUtils::setInt(m_ProgramObj, "s_texture0", 0);
     GLUtils::setInt(m_ProgramObj, "u_nImgType", IMAGE_FORMAT_RGBA);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+    LOGCATE("MediaCameraRender::OnDrawFrame %d %d", m_SurfaceWidth, m_SurfaceHeight);
 }
 
 void MediaCameraRender::UpdateMVPMatrix(int angleX, int angleY, float scaleX, float scaleY) {

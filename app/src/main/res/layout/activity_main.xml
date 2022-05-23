@@ -57,5 +57,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="视频录制"/>
+    <Button
+        android:id="@+id/btnModelRender"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="模型绘制"/>
 
 </LinearLayout>

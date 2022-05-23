@@ -45,5 +45,8 @@ class MainActivity : BaseActivity() {
         btnVideoRecorder.setOnClickListener {
             VideoRecorderActivity.start(mContext)
         }
+        btnModelRender.setOnClickListener {
+            ModelRenderActivity.start(mContext)
+        }
     }
 }
