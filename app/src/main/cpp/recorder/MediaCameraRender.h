@@ -13,6 +13,8 @@
 
 #define TEXTURE_NUM 3
 
+typedef void (*OnRenderFrameCallback)(void *, NativeImage *);
+
 class MediaCameraRender {
     MediaCameraRender();
     ~MediaCameraRender();
@@ -31,6 +33,11 @@ public:
     //更新变换矩阵，Camera预览帧需要进行旋转
     virtual void UpdateMVPMatrix(int angleX, int angleY, float scaleX, float scaleY);
     virtual void UpdateMVPMatrix(TransformMatrix * pTransformMatrix);
+
+    void SetRenderCallback(void *ctx, OnRenderFrameCallback callback) {
+        m_CallbackContext = ctx;
+        m_RenderFrameCallback = callback;
+    }
 
     virtual bool CreateFrameBufferObj();
     void GetRenderFrameFromFBO();
@@ -58,6 +65,9 @@ private:
 
     glm::mat4 m_MVPMatrix;
     TransformMatrix m_TransformMatrix;
+
+    OnRenderFrameCallback m_RenderFrameCallback = nullptr;
+    void *m_CallbackContext = nullptr;
 };
 
 

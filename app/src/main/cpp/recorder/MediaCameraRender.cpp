@@ -193,16 +193,30 @@ void MediaCameraRender::OnDrawFrame() {
     }
     std::unique_lock<std::mutex> lock(m_Mutex);
     glBindFramebuffer(GL_FRAMEBUFFER, m_SrcFboId);
-    glViewport(0, 0, m_RenderImage.height, m_RenderImage.width); // 相机的宽和高反了
+    if (m_TransformMatrix.degree == 0) {
+        glViewport(0, 0, m_RenderImage.width, m_RenderImage.height);
+    } else { // 相机预览帧的宽和高反了，在进行离屏渲染时需要校正
+        glViewport(0, 0, m_RenderImage.height, m_RenderImage.width);
+    }
+
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(m_FboProgramObj);
 
-    glBindTexture(GL_TEXTURE_2D, m_SrcFboTextureId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.height, m_RenderImage.width, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glBindTexture(GL_TEXTURE_2D, m_DstFboTextureId);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.height, m_RenderImage.width, 0,
-                 GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    if (m_TransformMatrix.degree == 0) {
+        glBindTexture(GL_TEXTURE_2D, m_SrcFboTextureId);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glBindTexture(GL_TEXTURE_2D, m_DstFboTextureId);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, m_SrcFboTextureId);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.height, m_RenderImage.width, 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+        glBindTexture(GL_TEXTURE_2D, m_DstFboTextureId);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.height, m_RenderImage.width, 0,
+                     GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    }
 
     switch (m_RenderImage.format) {
         case IMAGE_FORMAT_RGBA:
@@ -260,10 +274,14 @@ void MediaCameraRender::OnDrawFrame() {
 //    GLUtils::setInt(m_FboProgramObj, "s_texture0", 0);
     GLUtils::setInt(m_FboProgramObj, "u_nImgType", m_RenderImage.format);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
-    LOGCATE("MediaCameraRender::OnDrawFrame %d %d %d", m_RenderImage.width, m_RenderImage.height, m_RenderImage.format);
+//    LOGCATE("MediaCameraRender::OnDrawFrame %d %d %d", m_RenderImage.width, m_RenderImage.height, m_RenderImage.format);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_DstFboId);
-    glViewport(0, 0, m_RenderImage.height, m_RenderImage.width); // 相机的宽和高反了
+    if (m_TransformMatrix.degree == 0) {
+        glViewport(0, 0, m_RenderImage.width, m_RenderImage.height);
+    } else { // 相机预览帧的宽和高反了，在进行离屏渲染时需要校正
+        glViewport(0, 0, m_RenderImage.height, m_RenderImage.width);
+    }
     glClear(GL_COLOR_BUFFER_BIT);
     glUseProgram(m_ProgramObj);
     glBindVertexArray(m_VaoId);
@@ -288,7 +306,7 @@ void MediaCameraRender::OnDrawFrame() {
     GLUtils::setInt(m_ProgramObj, "s_texture0", 0);
     GLUtils::setInt(m_ProgramObj, "u_nImgType", IMAGE_FORMAT_RGBA);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
-    LOGCATE("MediaCameraRender::OnDrawFrame %d %d", m_SurfaceWidth, m_SurfaceHeight);
+//    LOGCATE("MediaCameraRender::OnDrawFrame %d %d", m_SurfaceWidth, m_SurfaceHeight);
 }
 
 void MediaCameraRender::UpdateMVPMatrix(int angleX, int angleY, float scaleX, float scaleY) {
@@ -394,7 +412,9 @@ bool MediaCameraRender::CreateFrameBufferObj() {
         glBindFramebuffer(GL_FRAMEBUFFER, m_SrcFboId);
         glBindTexture(GL_TEXTURE_2D, m_SrcFboTextureId);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_SrcFboTextureId, 0);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.height, m_RenderImage.width, 0,
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.height, m_RenderImage.width, 0,
+//                     GL_RGBA, GL_UNSIGNED_BYTE,nullptr);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0,
                      GL_RGBA, GL_UNSIGNED_BYTE,nullptr);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             LOGCATE("MediaCameraRender::CreateFrameBufferObj srcFbo glCheckFramebufferStatus status != GL_FRAMEBUFFER_COMPLETE");
@@ -416,7 +436,7 @@ bool MediaCameraRender::CreateFrameBufferObj() {
         glBindFramebuffer(GL_FRAMEBUFFER, m_DstFboId);
         glBindTexture(GL_TEXTURE_2D, m_DstFboTextureId);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_DstFboTextureId, 0);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.height, m_RenderImage.width, 0,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0,
                      GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             LOGCATE("MediaCameraRender::CreateFrameBufferObj dstFbo glCheckFramebufferStatus status != GL_FRAMEBUFFER_COMPLETE");
@@ -439,7 +459,29 @@ bool MediaCameraRender::CreateFrameBufferObj() {
 }
 
 void MediaCameraRender::GetRenderFrameFromFBO() {
-
+    if (m_RenderFrameCallback != nullptr) {
+        uint8_t *pBuffer = new uint8_t[m_RenderImage.width * m_RenderImage.height * 4];
+        NativeImage nativeImage = m_RenderImage;
+        nativeImage.format = IMAGE_FORMAT_RGBA;
+        if (m_TransformMatrix.degree == 0) {
+            nativeImage.width = m_RenderImage.width;
+            nativeImage.height = m_RenderImage.height;
+        } else {
+            nativeImage.width = m_RenderImage.height;
+            nativeImage.height = m_RenderImage.width;
+        }
+        nativeImage.pLineSize[0] = nativeImage.width * 4;
+        nativeImage.pLineSize[1] = 0;
+        nativeImage.pLineSize[2] = 0;
+        nativeImage.ppPlane[0] = pBuffer;
+        nativeImage.ppPlane[1] = nullptr;
+        nativeImage.ppPlane[2] = nullptr;
+        glReadPixels(0, 0, nativeImage.width, nativeImage.height, GL_RGBA, GL_UNSIGNED_BYTE, pBuffer);
+        LOGCATE("MediaCameraRender::GetRenderFrameFromFBO width=%d, height=%d, format=%d", nativeImage.width, nativeImage.height, nativeImage.format);
+        LOGCATE("MediaCameraRender::GetRenderFrameFromFBO src[line0,line1,line2]=[%d, %d, %d]", nativeImage.pLineSize[0], nativeImage.pLineSize[1], nativeImage.pLineSize[2]);
+        m_RenderFrameCallback(m_CallbackContext, &nativeImage);
+        delete[] pBuffer;
+    }
 }
 
 MediaCameraRender *MediaCameraRender::GetInstance() {

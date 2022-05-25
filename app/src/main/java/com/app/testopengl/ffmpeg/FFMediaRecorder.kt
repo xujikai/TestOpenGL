@@ -47,4 +47,16 @@ class FFMediaRecorder : GLSurfaceView.Renderer {
     fun setTransformMatrix(degree: Int, mirror: Int) {
         mNativeMediaRecorder.nativeSetTransformMatrix(0f, 0f, 1f, 1f, degree, mirror)
     }
+
+    fun startRecord(recorderType: Int, outUrl: String, frameWidth: Int, frameHeight: Int, videoBitRate: Long, fps: Int) {
+        mNativeMediaRecorder.startRecord(recorderType, outUrl, frameWidth, frameHeight, videoBitRate, fps)
+    }
+
+    fun stopRecord() {
+        mNativeMediaRecorder.stopRecord()
+    }
+
+    fun onAudioData(data: ByteArray) {
+        mNativeMediaRecorder.onAudioData(data)
+    }
 }

@@ -32,4 +32,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/btnStartRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="开始录制"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/btnStopRecord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止录制"
+        app:layout_constraintBottom_toBottomOf="@id/btnStartRecord"
+        app:layout_constraintStart_toEndOf="@id/btnStartRecord" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,7 +13,7 @@ class MainActivity : BaseActivity() {
 
     override fun initData() {
         btnRequestPermission.setOnClickListener {
-            PermissionUtils.permission(PermissionConstants.CAMERA, PermissionConstants.STORAGE)
+            PermissionUtils.permission(PermissionConstants.CAMERA, PermissionConstants.STORAGE, PermissionConstants.MICROPHONE)
                 .callback(object : PermissionUtils.SimpleCallback {
                     override fun onGranted() {
                         LogUtils.i("granted")

@@ -8,22 +8,25 @@ import androidx.lifecycle.lifecycleScope
 import com.app.testopengl.R
 import com.app.testopengl.base.BaseActivity
 import com.app.testopengl.bean.MotionBean
+import com.app.testopengl.ffmpeg.AudioRecorder
 import com.app.testopengl.ffmpeg.FFMediaRecorder
 import com.app.testopengl.opengl.RenderCons
 import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ResourceUtils
+import com.blankj.utilcode.util.ThreadUtils
 import com.google.android.filament.Fence
 import com.google.android.filament.utils.*
 import kotlinx.android.synthetic.main.activity_model_render.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.nio.ByteBuffer
 import kotlin.system.measureTimeMillis
 
 
-class ModelRenderActivity: BaseActivity() {
+class ModelRenderActivity: BaseActivity(), AudioRecorder.AudioRecorderCallback {
 
     private lateinit var modelViewer: ModelViewer
     private val automation = AutomationEngine()
@@ -43,6 +46,8 @@ class ModelRenderActivity: BaseActivity() {
     private var frameIndex = 0
 
     lateinit var mMediaRecorder: FFMediaRecorder
+    lateinit var mAudioRecorder: AudioRecorder
+    var mRecorderType = RenderCons.RECORDER_TYPE_AV
 
     companion object {
         init {
@@ -84,19 +89,47 @@ class ModelRenderActivity: BaseActivity() {
             }
         }
         lifecycleScope.launch(Dispatchers.Default) {
-            while (true) {
-                LogUtils.i("onPreviewFrame")
-                val bitmap = textureView.bitmap
-                bitmap?.let {
-//                    ivImage.setImageBitmap(bitmap)
-                    val buf = ByteBuffer.allocate(bitmap.byteCount)
-                    bitmap.copyPixelsToBuffer(buf)
-                    mMediaRecorder.onPreviewFrame(RenderCons.IMAGE_FORMAT_RGBA, bitmap.width, bitmap.height, buf.array())
-                    mMediaRecorder.requestRender()
-                    bitmap.recycle()
+            while (isActive) {
+                val millis = measureTimeMillis {
+                    val bitmap = textureView.bitmap
+                    bitmap?.let {
+                        LogUtils.i("onPreviewFrame", bitmap.width, bitmap.height, bitmap.byteCount)
+                        val buf = ByteBuffer.allocate(bitmap.byteCount)
+                        bitmap.copyPixelsToBuffer(buf)
+                        mMediaRecorder.onPreviewFrame(RenderCons.IMAGE_FORMAT_RGBA, bitmap.width, bitmap.height, buf.array())
+                        mMediaRecorder.requestRender()
+                        bitmap.recycle()
+                    }
                 }
-//                delay((motionFps * 1000L).toLong())
-                delay(100L)
+                LogUtils.i(millis)
+//                delay((0.04 * 1000L).toLong())
+//                delay(40L)
+            }
+        }
+
+        btnStartRecord.setOnClickListener {
+            val frameWidth = if (glSurface.width % 2 == 0) glSurface.width else glSurface.width - 1
+            val frameHeight = if (glSurface.height % 2 == 0) glSurface.height else glSurface.height - 1
+            LogUtils.i("onClick", glSurface.width, glSurface.height, textureView.width, textureView.height)
+            val fps = 25
+            val bitRate = (frameWidth * frameHeight * fps * 0.25).toLong()
+            mMediaRecorder.startRecord(mRecorderType, getVideoPath(), frameWidth, frameHeight, bitRate, fps)
+            if (mRecorderType == RenderCons.RECORDER_TYPE_AV) {
+                mAudioRecorder = AudioRecorder(this)
+                mAudioRecorder.start()
+            }
+        }
+        btnStopRecord.setOnClickListener {
+            if (mRecorderType == RenderCons.RECORDER_TYPE_AV) {
+                mAudioRecorder.interrupt()
+            }
+            ThreadUtils.getCachedPool().execute {
+                mMediaRecorder.stopRecord()
+                if (mRecorderType == RenderCons.RECORDER_TYPE_AV) {
+                    runOnUiThread {
+                        mAudioRecorder.join()
+                    }
+                }
             }
         }
     }
@@ -237,6 +270,18 @@ class ModelRenderActivity: BaseActivity() {
             manager.setTransform(entity - 1, motionFloatArray)
         }
         frameIndex++
+    }
+
+    private fun getVideoPath(): String {
+        return "${externalCacheDir?.path}/mediacodec_demo.mp4"
+    }
+
+    override fun onAudioData(data: ByteArray, dataSize: Int) {
+        mMediaRecorder.onAudioData(data)
+    }
+
+    override fun onError(msg: String) {
+        LogUtils.e(msg)
     }
 
 }

@@ -81,3 +81,29 @@ Java_com_app_testopengl_ffmpeg_MyNativeMediaRecorder_nativeSetTransformMatrix(JN
                                                                               jint mirror) {
     MyMediaRecorderContext::GetInstance()->SetTransformMatrix(translate_x, translate_y, scale_x, scale_y, degree, mirror);
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_app_testopengl_ffmpeg_MyNativeMediaRecorder_startRecord(JNIEnv *env, jobject thiz,
+                                                                 jint recorder_type,
+                                                                 jstring out_url, jint frame_width,
+                                                                 jint frame_height,
+                                                                 jlong video_bit_rate, jint fps) {
+    const char *url = env->GetStringUTFChars(out_url, nullptr);
+    MyMediaRecorderContext::GetInstance()->StartRecord(recorder_type, url, frame_width, frame_height, video_bit_rate, fps);
+    env->ReleaseStringUTFChars(out_url, url);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_app_testopengl_ffmpeg_MyNativeMediaRecorder_stopRecord(JNIEnv *env, jobject thiz) {
+    MyMediaRecorderContext::GetInstance()->StopRecord();
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_app_testopengl_ffmpeg_MyNativeMediaRecorder_onAudioData(JNIEnv *env, jobject thiz,
+                                                                 jbyteArray data) {
+    int len = env->GetArrayLength(data);
+    unsigned char *buf = new unsigned char[len];
+    env->GetByteArrayRegion(data, 0, len, reinterpret_cast<jbyte *>(buf));
+    MyMediaRecorderContext::GetInstance()->OnAudioData(buf, len);
+    delete[] buf;
+}

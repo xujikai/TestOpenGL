@@ -17,4 +17,8 @@ object RenderCons {
     const val EXAMPLE_TYPE_KEY_CONVEYOR_BELT = EXAMPLE_TYPE
     const val EXAMPLE_TYPE_KEY_BLUELINE_CHALLENGE = EXAMPLE_TYPE + 1
 
+    const val RECORDER_TYPE_SINGLE_VIDEO = 0 // 仅录制视频
+    const val RECORDER_TYPE_SINGLE_AUDIO = 1 // 仅录制音频
+    const val RECORDER_TYPE_AV = 2 // 同时录制音频和视频,打包成 MP4 文件
+
 }

@@ -24,7 +24,8 @@ file(GLOB src-files
         ${CMAKE_SOURCE_DIR}/render/*.cpp
         ${CMAKE_SOURCE_DIR}/util/*.cpp
         ${CMAKE_SOURCE_DIR}/sample/*.cpp
-        ${CMAKE_SOURCE_DIR}/recorder/*.cpp)
+        ${CMAKE_SOURCE_DIR}/recorder/*.cpp
+        ${CMAKE_SOURCE_DIR}/common/*.cpp)
 
 add_library( # Sets the name of the library.
         native-render
@@ -67,6 +68,9 @@ set(native-libs
         EGL
         GLESv3
         OpenSLES
+        android
+        m
+        z
         )
 
 target_link_libraries( # Specifies the target library.

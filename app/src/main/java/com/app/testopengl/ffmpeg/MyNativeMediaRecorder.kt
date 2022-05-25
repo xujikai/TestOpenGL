@@ -26,4 +26,10 @@ class MyNativeMediaRecorder {
 
     external fun nativeSetTransformMatrix(translateX: Float, translateY: Float, scaleX: Float, scaleY: Float, degree: Int, mirror: Int)
 
+    external fun startRecord(recorderType: Int, outUrl: String, frameWidth: Int, frameHeight: Int, videoBitRate: Long, fps: Int)
+
+    external fun stopRecord()
+
+    external fun onAudioData(data: ByteArray)
+
 }
