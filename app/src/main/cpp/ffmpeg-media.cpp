@@ -1,7 +1,7 @@
 #include <jni.h>
 #include <cstring>
 #include <libavcodec/version.h>
-#include "recorder/MyMediaRecorderContext.h"
+#include "context/MyMediaRecorderContext.h"
 
 //
 // Created by 徐极凯 on 2022/5/21.

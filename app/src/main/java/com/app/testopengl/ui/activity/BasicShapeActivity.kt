@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.Intent
 import com.app.testopengl.R
 import com.app.testopengl.base.BaseActivity
-import com.app.testopengl.opengl.render.PointRender
-import kotlinx.android.synthetic.main.activity_basic_shape.glSurface
+import com.app.testopengl.opengl.render.RectRender
+import com.app.testopengl.opengl.render.TextureRender
+import com.app.testopengl.opengl.render.TriangleRender
+import kotlinx.android.synthetic.main.activity_basic_shape.*
 
 /**
  * 基本形状的绘制
@@ -23,11 +25,9 @@ class BasicShapeActivity: BaseActivity() {
 
     override fun initData() {
         glSurface.setEGLContextClientVersion(2)
-        glSurface.setRenderer(PointRender(this))
-//        glSurface.setRenderer(LineRender(this))
-//        glSurface.setRenderer(TriangleRender(this))
-//        glSurface.setRenderer(RectRender(this))
-//        glSurface.setRenderer(CircleRender(this))
+//        glSurface.setRenderer(TriangleRender())
+//        glSurface.setRenderer(RectRender())
+        glSurface.setRenderer(TextureRender(this))
     }
 
 }

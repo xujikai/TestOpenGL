@@ -22,12 +22,13 @@ import static android.opengl.GLUtils.texImage2D;
 
 import com.app.testopengl.R;
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.Utils;
 
 /**
  * Created by glumes on 2017/8/1.
  */
 
-public class TextureHelper {
+public class GLTexUtils {
 
 //    private static int[] imageFileIDs = { // Image file IDs
 //            R.drawable.a, R.drawable.b, R.drawable.c, R.drawable.d, R.drawable.e,
@@ -48,10 +49,10 @@ public class TextureHelper {
     /**
      * 返回加载图像后的 OpenGl 纹理的 ID
      */
-    public static int loadTexture(Context context, int resourceId) {
+    public static int loadTexture(int resourceId) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
-        final Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+        final Bitmap bitmap = BitmapFactory.decodeResource(Utils.getApp().getResources(), resourceId, options);
 
         if (bitmap == null) {
             LogUtils.d("resource Id could not be decoded");

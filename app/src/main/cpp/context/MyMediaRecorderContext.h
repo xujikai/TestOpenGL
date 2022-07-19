@@ -8,14 +8,9 @@
 #include <thread>
 #include "../util/ImageDef.h"
 #include "../util/ByteFlowDef.h"
-#include "SingleVideoRecorder.h"
-#include "MediaRecorder.h"
-
-#define RECORDER_TYPE_SINGLE_VIDEO  0 //仅录制视频
-#define RECORDER_TYPE_SINGLE_AUDIO  1 //仅录制音频
-#define RECORDER_TYPE_AV            2 //同时录制音频和视频,打包成 MP4 文件
-
-#define DEFAULT_SAMPLE_RATE    44100
+#include "../recorder/SingleVideoRecorder.h"
+#include "../recorder/MediaRecorder.h"
+#include "../recorder/MediaCameraRender.h"
 
 class MyMediaRecorderContext {
     MyMediaRecorderContext();

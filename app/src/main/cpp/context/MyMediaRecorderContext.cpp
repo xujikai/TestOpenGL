@@ -3,7 +3,6 @@
 //
 
 #include "MyMediaRecorderContext.h"
-#include "MediaCameraRender.h"
 
 MyMediaRecorderContext *MyMediaRecorderContext::m_pContext = nullptr;
 

@@ -9,11 +9,8 @@
 #include "../util/ImageDef.h"
 #include "../util/ByteFlowDef.h"
 #include "../util/GLUtils.h"
+#include "../util/RecorderDef.h"
 #include <GLES3/gl3.h>
-
-#define TEXTURE_NUM 3
-
-typedef void (*OnRenderFrameCallback)(void *, NativeImage *);
 
 class MediaCameraRender {
     MediaCameraRender();

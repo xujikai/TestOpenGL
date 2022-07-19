@@ -25,7 +25,7 @@ file(GLOB src-files
         ${CMAKE_SOURCE_DIR}/util/*.cpp
         ${CMAKE_SOURCE_DIR}/sample/*.cpp
         ${CMAKE_SOURCE_DIR}/recorder/*.cpp
-        ${CMAKE_SOURCE_DIR}/common/*.cpp)
+        ${CMAKE_SOURCE_DIR}/context/*.cpp)
 
 add_library( # Sets the name of the library.
         native-render
