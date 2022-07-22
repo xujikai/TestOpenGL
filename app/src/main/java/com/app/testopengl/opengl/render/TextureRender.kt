@@ -19,7 +19,7 @@ class TextureRender: GLSurfaceView.Renderer {
     private var uModelMatrixLocation = -1
     private var uViewMatrixLocation = -1
     private var uProjectionMatrixLocation = -1
-    private var uTextureUnitLocation = -1
+    private var uTextureLocation = -1
 
     // ABD CDB
     // D C
@@ -57,7 +57,7 @@ class TextureRender: GLSurfaceView.Renderer {
         uModelMatrixLocation = GLES20.glGetUniformLocation(mProgram, "uModelMatrix")
         uViewMatrixLocation = GLES20.glGetUniformLocation(mProgram, "uViewMatrix")
         uProjectionMatrixLocation = GLES20.glGetUniformLocation(mProgram, "uProjectionMatrix")
-        uTextureUnitLocation = GLES20.glGetUniformLocation(mProgram, "uTextureUnit")
+        uTextureLocation = GLES20.glGetUniformLocation(mProgram, "uTexture")
 
         mVertexBuffer = GLComUtils.createFloatBuffer(mVertexArr)
         mTextureBuffer = GLComUtils.createFloatBuffer(mTextureArr)
@@ -97,7 +97,7 @@ class TextureRender: GLSurfaceView.Renderer {
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId)
-        GLES20.glUniform1i(uTextureUnitLocation, 0)
+        GLES20.glUniform1i(uTextureLocation, 0)
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4)
 

@@ -24,11 +24,11 @@ class MainActivity : BaseActivity() {
                     }
                 }).request()
         }
-        btnDrawPoint.setOnClickListener {
+        btnDrawBasic2.setOnClickListener {
             BasicShapeActivity.start(mContext)
         }
-        btnDrawTexture.setOnClickListener {
-            TextureActivity.start(mContext)
+        btnDrawBasic3.setOnClickListener {
+            BasicShape3Activity.start(mContext)
         }
         btnDrawTriangle.setOnClickListener {
             TriangleActivity.start(mContext)

@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.Utils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 public class GLComUtils {
 
@@ -92,6 +93,25 @@ public class GLComUtils {
         fb.put(coords);
         fb.position(0);
         return fb;
+    }
+
+    public static IntBuffer createIntBuffer(int[] coords) {
+        // Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
+        ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * Constants.BYTES_PRE_INT);
+        bb.order(ByteOrder.nativeOrder());
+        IntBuffer fb = bb.asIntBuffer();
+        fb.put(coords);
+        fb.position(0);
+        return fb;
+    }
+
+    public static ByteBuffer createByteBuffer(byte[] coords) {
+        // Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
+        ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * Constants.BYTES_PRE_BYTE);
+        bb.order(ByteOrder.nativeOrder());
+        bb.put(coords);
+        bb.position(0);
+        return bb;
     }
 
 }

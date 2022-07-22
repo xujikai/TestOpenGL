@@ -20,7 +20,7 @@ class TextureActivity: BaseActivity() {
 
     override fun initData() {
         glSurface.setEGLContextClientVersion(2)
-        glSurface.setRenderer(TextureRender(this))
+        glSurface.setRenderer(TextureRender())
     }
 
 }

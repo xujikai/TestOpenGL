@@ -4,17 +4,17 @@ import android.content.Context
 import android.content.Intent
 import com.app.testopengl.R
 import com.app.testopengl.base.BaseActivity
-import com.app.testopengl.opengl.render.*
+import com.app.testopengl.opengl.render.VBORender
 import kotlinx.android.synthetic.main.activity_basic_shape.*
 
 /**
- * 基本形状的绘制
+ * OpenGL 3.0
  */
-class BasicShapeActivity: BaseActivity() {
+class BasicShape3Activity: BaseActivity() {
 
     companion object {
         fun start(context: Context) {
-            val intent = Intent(context, BasicShapeActivity::class.java)
+            val intent = Intent(context, BasicShape3Activity::class.java)
             context.startActivity(intent)
         }
     }
@@ -22,12 +22,9 @@ class BasicShapeActivity: BaseActivity() {
     override fun getLayoutId(): Int = R.layout.activity_basic_shape
 
     override fun initData() {
-        glSurface.setEGLContextClientVersion(2)
-//        glSurface.setRenderer(TriangleRender())
-//        glSurface.setRenderer(RectRender())
-//        glSurface.setRenderer(TextureRender())
-//        glSurface.setRenderer(FBORender())
-        glSurface.setRenderer(FBONv21Render())
+        glSurface.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
+        glSurface.setEGLContextClientVersion(3)
+        glSurface.setRenderer(VBORender())
     }
 
 }

@@ -23,15 +23,15 @@
         android:layout_height="wrap_content"
         android:text="请求权限"/>
     <Button
-        android:id="@+id/btnDrawPoint"
+        android:id="@+id/btnDrawBasic2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="基本图形的绘制"/>
+        android:text="基本图形2.0的绘制"/>
     <Button
-        android:id="@+id/btnDrawTexture"
+        android:id="@+id/btnDrawBasic3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="纹理的绘制"/>
+        android:text="基本图形3.0的绘制"/>
     <Button
         android:id="@+id/btnDrawTriangle"
         android:layout_width="wrap_content"
