@@ -12,6 +12,13 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
+        val flag1 = 0b0010
+        var res = 0b0000
+        res = res or flag1
+        println(res)
+        res = res xor flag1
+        println(res)
+
         assertEquals(4, 2 + 2)
     }
 }
