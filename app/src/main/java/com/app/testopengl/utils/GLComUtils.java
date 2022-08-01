@@ -114,7 +114,7 @@ public class GLComUtils {
         return bb;
     }
 
-    private float[] getIdentity() {
+    public static float[] getIdentity() {
         return new float[]{
                 1f, 0f, 0f, 0f,
                 0f, 1f, 0f, 0f,

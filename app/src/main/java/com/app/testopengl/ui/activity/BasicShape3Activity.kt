@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import com.app.testopengl.R
 import com.app.testopengl.base.BaseActivity
+import com.app.testopengl.opengl.render.LightDirectionRender
+import com.app.testopengl.opengl.render.LightPointRender
 import com.app.testopengl.opengl.render.MRTRender
 import com.app.testopengl.opengl.render.VBORender
 import kotlinx.android.synthetic.main.activity_basic_shape.*
@@ -23,10 +25,12 @@ class BasicShape3Activity: BaseActivity() {
     override fun getLayoutId(): Int = R.layout.activity_basic_shape
 
     override fun initData() {
-        glSurface.setEGLConfigChooser(8, 8, 8, 8, 0, 0)
+        glSurface.setEGLConfigChooser(8, 8, 8, 8, 8, 0)
         glSurface.setEGLContextClientVersion(3)
 //        glSurface.setRenderer(VBORender())
-        glSurface.setRenderer(MRTRender())
+//        glSurface.setRenderer(MRTRender())
+//        glSurface.setRenderer(LightDirectionRender())
+        glSurface.setRenderer(LightPointRender())
     }
 
 }
