@@ -4,28 +4,48 @@ import android.opengl.GLSurfaceView
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class MyGLRender(private val mNativeRender: MyNativeRender): GLSurfaceView.Renderer {
+class MyGLRender: GLSurfaceView.Renderer {
+
+    companion object {
+        init {
+            System.loadLibrary("native-render")
+        }
+    }
+
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
-        mNativeRender.nativeOnSurfaceCreated()
+        nativeOnSurfaceCreated()
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
-        mNativeRender.nativeOnSurfaceChanged(width, height)
+        nativeOnSurfaceChanged(width, height)
     }
 
     override fun onDrawFrame(gl: GL10) {
-        mNativeRender.nativeOnDrawFrame()
+        nativeOnDrawFrame()
     }
 
     fun init() {
-        mNativeRender.nativeInit()
+        nativeInit()
     }
 
     fun unInit() {
-        mNativeRender.nativeUnInit()
+        nativeUnInit()
     }
 
     fun setImageData(format: Int, width: Int, height: Int, bytes: ByteArray) {
-        mNativeRender.nativeSetImageData(format, width, height, bytes)
+        nativeSetImageData(format, width, height, bytes)
     }
+
+    private external fun nativeInit()
+
+    private external fun nativeUnInit()
+
+    private external fun nativeOnSurfaceCreated()
+
+    private external fun nativeOnSurfaceChanged(width: Int, height: Int)
+
+    private external fun nativeOnDrawFrame()
+
+    private external fun nativeSetImageData(format: Int, width: Int, height: Int, bytes: ByteArray)
+
 }

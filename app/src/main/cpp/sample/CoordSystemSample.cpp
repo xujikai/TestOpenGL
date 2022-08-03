@@ -5,151 +5,148 @@
 #include <gtc/matrix_transform.hpp>
 #include "CoordSystemSample.h"
 
-CoordSystemSample::CoordSystemSample() {
-    m_TextureId = GL_NONE;
-    m_VaoId = GL_NONE;
-    m_SamplerLoc = GL_NONE;
-    m_MVPMatrixLoc = GL_NONE;
+static GLfloat mVertexArr[] = {
+        -1.0f,  1.0f, 0.0f,  // Position 0
+        -1.0f, -1.0f, 0.0f,  // Position 1
+        1.0f,  -1.0f, 0.0f,  // Position 2
+        1.0f,   1.0f, 0.0f,  // Position 3
+};
 
-    m_RotateX = 0;
-    m_RotateY = 80;
-    m_ScaleX = 1.0f;
-    m_ScaleY = 1.0f;
+static GLfloat mTexCoordArr[] = {
+        0.0f,  0.0f,        // TexCoord 0
+        0.0f,  1.0f,        // TexCoord 1
+        1.0f,  1.0f,        // TexCoord 2
+        1.0f,  0.0f         // TexCoord 3
+};
+
+static GLushort mIndexArr[] = {0, 1, 2, 0, 2, 3};
+
+CoordSystemSample::CoordSystemSample() {
+    mVaoId = GL_NONE;
+    uTextureLoc = GL_NONE;
+    uMVPMatrixLoc = GL_NONE;
+    mImageTexture = GL_NONE;
+
+    mRotateX = 0;
+    mRotateY = 10;
+    mScaleX = 1.0f;
+    mScaleY = 1.0f;
 }
 
 CoordSystemSample::~CoordSystemSample() {
-    NativeImageUtil::FreeNativeImage(&m_RenderImage);
+    NativeImageUtil::FreeNativeImage(&mRenderImage);
 }
 
 void CoordSystemSample::Init() {
-    if (m_ProgramObj != GL_NONE) return;
+    if (mProgramObj != GL_NONE) return;
 
     char vShaderStr[] =
             "#version 300 es\n"
-            "layout(location = 0) in vec4 a_position;\n"
-            "layout(location = 1) in vec2 a_texCoord;\n"
-            "uniform mat4 u_MVPMatrix;\n"
-            "out vec2 v_texCoord;\n"
+            "layout(location = 0) in vec4 aPosition;\n"
+            "layout(location = 1) in vec2 aTexCoord;\n"
+            "uniform mat4 uMVPMatrix;\n"
+            "out vec2 vTexCoord;\n"
             "void main()\n"
             "{\n"
-            "    gl_Position = u_MVPMatrix * a_position;\n"
-            "    v_texCoord = a_texCoord;\n"
+            "    gl_Position = uMVPMatrix * aPosition;\n"
+            "    vTexCoord = aTexCoord;\n"
             "}";
 
     char fShaderStr[] =
             "#version 300 es                                     \n"
             "precision mediump float;                            \n"
-            "in vec2 v_texCoord;                                 \n"
-            "layout(location = 0) out vec4 outColor;             \n"
-            "uniform sampler2D s_TextureMap;                     \n"
+            "in vec2 vTexCoord;                                  \n"
+            "layout(location = 0) out vec4 fragColor;            \n"
+            "uniform sampler2D uTexture;                         \n"
             "void main()                                         \n"
             "{                                                   \n"
-            "  outColor = texture(s_TextureMap, v_texCoord);     \n"
+            "  fragColor = texture(uTexture, vTexCoord);         \n"
             "}                                                   \n";
 
-    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
-    if (m_ProgramObj) {
-        m_SamplerLoc = glGetUniformLocation(m_ProgramObj, "s_TextureMap");
-        m_MVPMatrixLoc = glGetUniformLocation(m_ProgramObj, "u_MVPMatrix");
-    } else {
-        LOGCATE("CoordSystemSample::Init create program fail");
-    }
+    mProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr);
 
-    GLfloat verticesCoords[] = {
-            -1.0f,  1.0f, 0.0f,  // Position 0
-            -1.0f, -1.0f, 0.0f,  // Position 1
-            1.0f,  -1.0f, 0.0f,  // Position 2
-            1.0f,   1.0f, 0.0f,  // Position 3
-    };
-
-    GLfloat textureCoords[] = {
-            0.0f,  0.0f,        // TexCoord 0
-            0.0f,  1.0f,        // TexCoord 1
-            1.0f,  1.0f,        // TexCoord 2
-            1.0f,  0.0f         // TexCoord 3
-    };
-
-    GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
+    aPositionLoc = 0;
+    aTexCoordLoc = 1;
+    uTextureLoc = glGetUniformLocation(mProgramObj, "uTexture");
+    uMVPMatrixLoc = glGetUniformLocation(mProgramObj, "uMVPMatrix");
 
     // 生成 VBO 并绑定数据
-    glGenBuffers(3, m_VboIds);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesCoords), verticesCoords, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(textureCoords), textureCoords, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[2]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glGenBuffers(3, mVboIds);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mVertexArr), mVertexArr, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mTexCoordArr), mTexCoordArr, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVboIds[2]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mIndexArr), mIndexArr, GL_STATIC_DRAW);
 
     // 生成 VAO 并绑定数据
-    glGenVertexArrays(1, &m_VaoId);
-    glBindVertexArray(m_VaoId);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void *)0);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (const void *)0);
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[2]);
+    glGenVertexArrays(1, &mVaoId);
+    glBindVertexArray(mVaoId);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[0]);
+    glVertexAttribPointer(aPositionLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (const void *)0);
+    glEnableVertexAttribArray(aPositionLoc);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[1]);
+    glVertexAttribPointer(aTexCoordLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (const void *)0);
+    glEnableVertexAttribArray(aTexCoordLoc);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVboIds[2]);
     glBindVertexArray(GL_NONE);
 
     // 生成纹理
-    glGenTextures(1, &m_TextureId);
-    glBindTexture(GL_TEXTURE_2D, m_TextureId);
+    glGenTextures(1, &mImageTexture);
+    glBindTexture(GL_TEXTURE_2D, mImageTexture);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // 给纹理赋值图像数据
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_RenderImage.ppPlane[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mRenderImage.width, mRenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, mRenderImage.ppPlane[0]);
     glBindTexture(GL_TEXTURE_2D, GL_NONE);
 }
 
 void CoordSystemSample::Draw(int screenW, int screenH) {
-    if (m_ProgramObj == GL_NONE || m_TextureId == GL_NONE) return;
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    UpdateMVPMatrix(m_MVPMatrix, m_RotateX, m_RotateY, (float)screenW / (float)screenH);
+    glUseProgram(mProgramObj);
 
-    glUseProgram(m_ProgramObj);
-    glBindVertexArray(m_VaoId);
+    glBindVertexArray(mVaoId);
 
-    glUniformMatrix4fv(m_MVPMatrixLoc, 1, GL_FALSE, &m_MVPMatrix[0][0]);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_TextureId);
-    glUniform1i(m_SamplerLoc, 0);
+    glBindTexture(GL_TEXTURE_2D, mImageTexture);
+    glUniform1i(uTextureLoc, 0);
+
+    UpdateMVPMatrix(mMVPMatrix, mRotateX, mRotateY, (float)screenW / (float)screenH);
+    glUniformMatrix4fv(uMVPMatrixLoc, 1, GL_FALSE, &mMVPMatrix[0][0]);
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (const void *)0);
 
     glBindVertexArray(GL_NONE);
 }
 
-void CoordSystemSample::Destroy() {
-    if (m_ProgramObj) {
-        glDeleteProgram(m_ProgramObj);
-        glDeleteBuffers(3, m_VboIds);
-        glDeleteVertexArrays(1, &m_VaoId);
-        glDeleteTextures(1, &m_TextureId);
+void CoordSystemSample::UnInit() {
+    if (mProgramObj) {
+        glDeleteProgram(mProgramObj);
+        glDeleteBuffers(3, mVboIds);
+        glDeleteVertexArrays(1, &mVaoId);
+        glDeleteTextures(1, &mImageTexture);
     }
 }
 
-void CoordSystemSample::LoadImage(NativeImage *pImage) {
+void CoordSystemSample::SetImageData(NativeImage *pImage) {
     if (pImage) {
-        m_RenderImage.width = pImage->width;
-        m_RenderImage.height = pImage->height;
-        m_RenderImage.format = pImage->format;
-        NativeImageUtil::CopyNativeImage(pImage, &m_RenderImage);
+        mRenderImage.width = pImage->width;
+        mRenderImage.height = pImage->height;
+        mRenderImage.format = pImage->format;
+        NativeImageUtil::CopyNativeImage(pImage, &mRenderImage);
     }
 }
 
 void CoordSystemSample::UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {
-    m_RotateX = static_cast<int>(rotateX);
-    m_RotateY = static_cast<int>(rotateY);
+    mRotateX = static_cast<int>(rotateX);
+    mRotateY = static_cast<int>(rotateY);
 
-    m_ScaleX = scaleX;
-    m_ScaleY = scaleY;
+    mScaleX = scaleX;
+    mScaleY = scaleY;
 }
 
 void CoordSystemSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int rotateX, int rotateY, float ratio) {
@@ -159,21 +156,21 @@ void CoordSystemSample::UpdateMVPMatrix(glm::mat4 &mvpMatrix, int rotateX, int r
     float radiansX = static_cast<float>(MATH_PI / 180 * rotateX);
     float radiansY = static_cast<float>(MATH_PI / 180 * rotateY);
 
-    // 投影矩阵
-    glm::mat4 ProjectionMat = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
+    // 模型矩阵
+    glm::mat4 modelMatrix = glm::mat4(1.0f);
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(mScaleX, mScaleY, 1.0f));
+    modelMatrix = glm::rotate(modelMatrix, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
+    modelMatrix = glm::rotate(modelMatrix, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
 
     // 视图矩阵
-    glm::mat4 ViewMat = glm::lookAt(
+    glm::mat4 viewMatrix = glm::lookAt(
             glm::vec3(0, 0, 4),
             glm::vec3(0, 0, 0),
             glm::vec3(0, 1, 0)
-            );
+    );
 
-    // 模型矩阵
-    glm::mat4 ModelMat = glm::mat4(1.0f);
-    ModelMat = glm::scale(ModelMat, glm::vec3(m_ScaleX, m_ScaleY, 1.0f));
-    ModelMat = glm::rotate(ModelMat, radiansX, glm::vec3(1.0f, 0.0f, 0.0f));
-    ModelMat = glm::rotate(ModelMat, radiansY, glm::vec3(0.0f, 1.0f, 0.0f));
+    // 投影矩阵
+    glm::mat4 projectionMatrix = glm::perspective(45.0f, ratio, 0.1f, 100.0f);
 
-    mvpMatrix = ProjectionMat * ViewMat * ModelMat;
+    mvpMatrix = projectionMatrix * viewMatrix * modelMatrix;
 }

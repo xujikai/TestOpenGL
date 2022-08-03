@@ -13,7 +13,7 @@ MyCameraRenderContext::MyCameraRenderContext() {
 
 MyCameraRenderContext::~MyCameraRenderContext() {
     if (m_pSample) {
-        delete m_pSample;
+//        delete m_pSample;
         m_pSample = nullptr;
     }
 }

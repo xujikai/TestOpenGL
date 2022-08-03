@@ -19,27 +19,31 @@ public:
 
     void Draw(int screenW, int screenH) override;
 
-    void Destroy() override;
+    void UnInit() override;
 
-    void LoadImage(NativeImage *pImage) override;
+    void SetImageData(NativeImage *pImage) override;
 
-    virtual void UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY);
+    void UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) override;
 
-    virtual void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int rotateX, int rotateY, float ratio);
+    void UpdateMVPMatrix(glm::mat4 &mvpMatrix, int rotateX, int rotateY, float ratio);
 
 private:
-    GLuint m_TextureId;
-    GLuint m_VaoId;
-    GLuint m_VboIds[3];
-    GLint m_SamplerLoc;
-    GLint m_MVPMatrixLoc;
-    NativeImage m_RenderImage;
-    glm::mat4 m_MVPMatrix;
+    GLint aPositionLoc;
+    GLint aTexCoordLoc;
+    GLint uTextureLoc;
+    GLint uMVPMatrixLoc;
 
-    int m_RotateX;
-    int m_RotateY;
-    float m_ScaleX;
-    float m_ScaleY;
+    GLuint mVaoId;
+    GLuint mVboIds[3];
+
+    GLuint mImageTexture;
+    NativeImage mRenderImage;
+    glm::mat4 mMVPMatrix;
+
+    int mRotateX;
+    int mRotateY;
+    float mScaleX;
+    float mScaleY;
 };
 
 

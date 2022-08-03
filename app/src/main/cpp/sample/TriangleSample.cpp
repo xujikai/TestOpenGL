@@ -6,19 +6,25 @@
 #include "../util/GLUtils.h"
 #include "../util/LogUtil.h"
 
-TriangleSample::TriangleSample() = default;
+static GLfloat mVertexArr[] = {
+        0.0f, 0.5f, 0.0f,
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+};
+
+TriangleSample::TriangleSample() {
+    aPositionLocation = 0;
+}
 
 TriangleSample::~TriangleSample() = default;
 
 void TriangleSample::Init() {
-    if (m_ProgramObj != GL_NONE) return;
-
     char vShaderStr[] =
             "#version 300 es                          \n"
-            "layout(location = 0) in vec4 vPosition;  \n"
+            "layout(location = 0) in vec4 aPosition;  \n"
             "void main()                              \n"
             "{                                        \n"
-            "   gl_Position = vPosition;              \n"
+            "   gl_Position = aPosition;              \n"
             "}                                        \n";
 
     char fShaderStr[] =
@@ -30,33 +36,26 @@ void TriangleSample::Init() {
             "   fragColor = vec4(1.0, 0.0, 0.0, 1.0);     \n"
             "}                                            \n";
 
-    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
+    mProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr);
 }
 
 void TriangleSample::Draw(int screenW, int screenH) {
-    if (m_ProgramObj == GL_NONE) return;
-
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    GLfloat vVertices[] = {
-            0.0f, 0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-    };
+    glUseProgram(mProgramObj);
 
-    glUseProgram(m_ProgramObj);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
-    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(aPositionLocation, 3, GL_FLOAT, GL_FALSE, 0, mVertexArr);
+    glEnableVertexAttribArray(aPositionLocation);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
     glUseProgram(GL_NONE);
 }
 
-void TriangleSample::Destroy() {
-    if (m_ProgramObj) {
-        glDeleteProgram(m_ProgramObj);
-        m_ProgramObj = GL_NONE;
+void TriangleSample::UnInit() {
+    if (mProgramObj) {
+        glDeleteProgram(mProgramObj);
+        mProgramObj = GL_NONE;
     }
 }

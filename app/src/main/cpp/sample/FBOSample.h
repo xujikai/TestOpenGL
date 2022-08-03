@@ -18,25 +18,30 @@ public:
 
     void Draw(int screenW, int screenH) override;
 
-    void Destroy() override;
+    void UnInit() override;
 
-    void LoadImage(NativeImage *pImage) override;
+    void SetImageData(NativeImage *pImage) override;
 
     bool CreateFrameBufferObj();
 
 private:
-    GLuint m_FboProgramObj;
-    GLuint m_FboVertexShader;
-    GLuint m_FboFragmentShader;
-    GLint m_FboSamplerLoc;
-    GLuint m_FboTextureId;
-    GLuint m_FboId;
+    GLuint mFboProgramObj;
+    GLuint mFboId;
 
-    GLint m_SamplerLoc;
-    GLuint m_TextureId;
-    GLuint m_VaoIds[2];
-    GLuint m_VboIds[4];
-    NativeImage m_RenderImage;
+    GLuint aPositionLoc;
+    GLuint aFboPositionLoc;
+    GLuint aTexCoordLoc;
+    GLuint aFboTexCoordLoc;
+    GLint uTextureLoc;
+    GLint uFboTextureLoc;
+
+    GLuint mVaoIds[2];
+    GLuint mVboIds[4];
+
+    GLuint mImageTexture;
+    GLuint mFboTexture;
+
+    NativeImage mRenderImage;
 };
 
 

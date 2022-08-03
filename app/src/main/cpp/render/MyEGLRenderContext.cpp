@@ -298,7 +298,7 @@ const GLfloat vFboTexCoors[] = {
         1.0f, 1.0f,  // top right
 };
 
-const GLushort indices[] = { 0, 1, 2, 1, 3, 2 };
+const GLushort mIndexArr[] = {0, 1, 2, 1, 3, 2 };
 
 MyEGLRenderContext* MyEGLRenderContext::m_Instance = nullptr;
 
@@ -371,7 +371,7 @@ void MyEGLRenderContext::Init() {
     glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vTexCoors), vTexCoors, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[2]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mIndexArr), mIndexArr, GL_STATIC_DRAW);
 
 
     glGenVertexArrays(1, m_VaoIds);

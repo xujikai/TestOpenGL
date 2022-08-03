@@ -41,7 +41,7 @@ typedef struct ByteFlowFrame
 		pVPlane = NULL;
 	}
 
-};
+} ByteFlowFrame;
 
 typedef struct TransformMatrix
 {
@@ -77,7 +77,7 @@ typedef struct TransformMatrix
 
 	}
 
-};
+} TransformMatrix;
 
 class ByteFlowFrameUtil
 {

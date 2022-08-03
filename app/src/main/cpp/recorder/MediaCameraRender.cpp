@@ -74,21 +74,21 @@ static char fShaderStr[] =
         "    }\n"
         "}";
 
-static GLfloat verticesCoords[] = {
+static GLfloat mVertexArr[] = {
         -1.0f,  1.0f, 0.0f,  // Position 0
         -1.0f, -1.0f, 0.0f,  // Position 1
         1.0f,  -1.0f, 0.0f,  // Position 2
         1.0f,   1.0f, 0.0f,  // Position 3
 };
 
-static GLfloat textureCoords[] = {
+static GLfloat mTexCoordArr[] = {
         0.0f,  0.0f,        // TexCoord 0
         0.0f,  1.0f,        // TexCoord 1
         1.0f,  1.0f,        // TexCoord 2
         1.0f,  0.0f         // TexCoord 3
 };
 
-static GLushort indices[] = { 0, 1, 2, 0, 2, 3 };
+static GLushort mIndexArr[] = {0, 1, 2, 0, 2, 3 };
 
 MediaCameraRender *MediaCameraRender::m_pSample = nullptr;
 std::mutex MediaCameraRender::m_Mutex;
@@ -153,11 +153,11 @@ void MediaCameraRender::OnSurfaceCreated() {
 
     glGenBuffers(3, m_VboIds);
     glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesCoords), verticesCoords, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mVertexArr), mVertexArr, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(textureCoords), textureCoords, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mTexCoordArr), mTexCoordArr, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[2]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mIndexArr), mIndexArr, GL_STATIC_DRAW);
 
     glGenVertexArrays(1, &m_VaoId);
     glBindVertexArray(m_VaoId);
@@ -271,10 +271,10 @@ void MediaCameraRender::OnDrawFrame() {
         sprintf(samplerName, "s_texture%d", i);
         GLUtils::setInt(m_FboProgramObj, samplerName, i);
     }
-//    GLUtils::setInt(m_FboProgramObj, "s_texture0", 0);
+//    GLUtils::setInt(mFboProgramObj, "s_texture0", 0);
     GLUtils::setInt(m_FboProgramObj, "u_nImgType", m_RenderImage.format);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
-//    LOGCATE("MediaCameraRender::OnDrawFrame %d %d %d", m_RenderImage.width, m_RenderImage.height, m_RenderImage.format);
+//    LOGCATE("MediaCameraRender::OnDrawFrame %d %d %d", mRenderImage.width, mRenderImage.height, mRenderImage.format);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_DstFboId);
     if (m_TransformMatrix.degree == 0) {
@@ -306,7 +306,7 @@ void MediaCameraRender::OnDrawFrame() {
     GLUtils::setInt(m_ProgramObj, "s_texture0", 0);
     GLUtils::setInt(m_ProgramObj, "u_nImgType", IMAGE_FORMAT_RGBA);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
-//    LOGCATE("MediaCameraRender::OnDrawFrame %d %d", m_SurfaceWidth, m_SurfaceHeight);
+//    LOGCATE("MediaCameraRender::OnDrawFrame %d %d", mSurfaceWidth, mSurfaceHeight);
 }
 
 void MediaCameraRender::UpdateMVPMatrix(int angleX, int angleY, float scaleX, float scaleY) {
@@ -412,7 +412,7 @@ bool MediaCameraRender::CreateFrameBufferObj() {
         glBindFramebuffer(GL_FRAMEBUFFER, m_SrcFboId);
         glBindTexture(GL_TEXTURE_2D, m_SrcFboTextureId);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_SrcFboTextureId, 0);
-//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.height, m_RenderImage.width, 0,
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mRenderImage.height, mRenderImage.width, 0,
 //                     GL_RGBA, GL_UNSIGNED_BYTE,nullptr);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0,
                      GL_RGBA, GL_UNSIGNED_BYTE,nullptr);

@@ -7,20 +7,22 @@
 
 #include "GLSampleBase.h"
 
-class VaoSample: public GLSampleBase {
+class VAOSample: public GLSampleBase {
 
 public:
-    VaoSample();
 
     void Init() override;
 
     void Draw(int screenW, int screenH) override;
 
-    void Destroy() override;
+    void UnInit() override;
 
 private:
-    GLuint m_VaoId;
-    GLuint m_VboIds[2];
+    GLuint aPositionLoc;
+    GLuint aColorLoc;
+
+    GLuint mVaoId;
+    GLuint mVboIds[2];
 
 };
 

@@ -12,12 +12,9 @@
 class GLSampleBase {
 public:
     GLSampleBase() {
-        m_ProgramObj = GL_NONE;
-        m_VertexShader = GL_NONE;
-        m_FragmentShader = GL_NONE;
-
-        m_SurfaceWidth = 0;
-        m_SurfaceHeight = 0;
+        mProgramObj = GL_NONE;
+        mSurfaceWidth = 0;
+        mSurfaceHeight = 0;
     };
     virtual ~GLSampleBase() {};
 
@@ -25,17 +22,15 @@ public:
 
     virtual void Draw(int screenW, int screenH) = 0;
 
-    virtual void Destroy() = 0;
+    virtual void UnInit() = 0;
 
-    virtual void LoadImage(NativeImage *pImage) {};
+    virtual void SetImageData(NativeImage *pImage) {};
 
     virtual void UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {};
 protected:
-    GLuint m_ProgramObj;
-    GLuint m_VertexShader;
-    GLuint m_FragmentShader;
-    int m_SurfaceWidth;
-    int m_SurfaceHeight;
+    GLuint mProgramObj;
+    int mSurfaceWidth;
+    int mSurfaceHeight;
 };
 
 #endif //TESTOPENGL_GLSAMPLEBASE_H

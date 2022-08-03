@@ -15,16 +15,18 @@ public:
 
     virtual void Init();
 
-    virtual void Destroy();
+    virtual void UnInit();
 
     virtual void Draw(int screenW, int screenH);
 
-    void LoadImage(NativeImage *pImage);
+    void SetImageData(NativeImage *pImage);
 
 private:
-    GLuint m_TextureId;
-    GLint m_SamplerLoc{};
-    NativeImage m_RenderImage;
+    GLint aPositionLoc;
+    GLint aTexCoordLoc;
+    GLint uTextureLoc;
+    GLuint mImageTexture;
+    NativeImage mRenderImage;
 };
 
 #endif //TESTOPENGL_TEXTUREMAPSAMPLE_H

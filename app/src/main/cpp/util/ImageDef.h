@@ -146,17 +146,17 @@ public:
             }
                 break;
             case IMAGE_FORMAT_RGBA: {
-                if (pSrcImg->pLineSize[0] != pDstImg->pLineSize[0]) {
-                    for (int i = 0; i < pSrcImg->height; ++i) {
-                        memcpy(pDstImg->ppPlane[0] + i * pDstImg->pLineSize[0],
-                               pSrcImg->ppPlane[0] + i * pSrcImg->pLineSize[0], pDstImg->width * 4);
-                    }
-                } else {
-                    memcpy(pDstImg->ppPlane[0], pSrcImg->ppPlane[0],
-                           pSrcImg->pLineSize[0] * pSrcImg->height);
-                }
-//                memcpy(pDstImg->ppPlane[0], pSrcImg->ppPlane[0],
-//                       pSrcImg->width * pSrcImg->height * 4);
+//                if (pSrcImg->pLineSize[0] != pDstImg->pLineSize[0]) {
+//                    for (int i = 0; i < pSrcImg->height; ++i) {
+//                        memcpy(pDstImg->ppPlane[0] + i * pDstImg->pLineSize[0],
+//                               pSrcImg->ppPlane[0] + i * pSrcImg->pLineSize[0], pDstImg->width * 4);
+//                    }
+//                } else {
+//                    memcpy(pDstImg->ppPlane[0], pSrcImg->ppPlane[0],
+//                           pSrcImg->pLineSize[0] * pSrcImg->height);
+//                }
+                memcpy(pDstImg->ppPlane[0], pSrcImg->ppPlane[0],
+                       pSrcImg->width * pSrcImg->height * 4);
             }
                 break;
             case IMAGE_FORMAT_GRAY: {

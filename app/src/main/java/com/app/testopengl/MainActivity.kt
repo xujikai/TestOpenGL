@@ -30,8 +30,8 @@ class MainActivity : BaseActivity() {
         btnDrawBasic3.setOnClickListener {
             BasicShape3Activity.start(mContext)
         }
-        btnDrawTriangle.setOnClickListener {
-            TriangleActivity.start(mContext)
+        btnDrawNative.setOnClickListener {
+            BasicShapeNativeActivity.start(mContext)
         }
         btnDrawEgl.setOnClickListener {
             EglActivity.start(mContext)

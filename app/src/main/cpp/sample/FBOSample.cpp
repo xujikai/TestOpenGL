@@ -5,145 +5,137 @@
 #include "FBOSample.h"
 #include "../util/GLUtils.h"
 
-#define VERTEX_POS_INDX  0
-#define TEXTURE_POS_INDX 1
+//顶点坐标
+static GLfloat mVertexArr[] = {
+        -1.0f, -1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,
+        1.0f,  1.0f, 0.0f,
+};
+//正常纹理坐标
+static GLfloat mTexCoordArr[] = {
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+};
+//fbo 纹理坐标与正常纹理方向不同，原点位于左下角
+static GLfloat mFboTexCoordArr[] = {
+        0.0f, 0.0f,
+        1.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+};
+static GLushort mIndexArr[] = {0, 1, 2, 1, 3, 2};
 
 FBOSample::FBOSample() {
-    m_FboProgramObj = GL_NONE;
-    m_FboVertexShader = GL_NONE;
-    m_FboFragmentShader = GL_NONE;
-    m_FboSamplerLoc = GL_NONE;
-    m_FboTextureId = GL_NONE;
-    m_FboId = GL_NONE;
+    mFboProgramObj = GL_NONE;
+    mFboId = GL_NONE;
 
-    m_SamplerLoc = GL_NONE;
-    m_TextureId = GL_NONE;
-    m_VaoIds[0] = GL_NONE;
-    m_VboIds[0] = GL_NONE;
+    uTextureLoc = GL_NONE;
+    uFboTextureLoc = GL_NONE;
+
+    mVaoIds[0] = GL_NONE;
+    mVboIds[0] = GL_NONE;
+
+    mImageTexture = GL_NONE;
+    mFboTexture = GL_NONE;
 }
 
 FBOSample::~FBOSample() {
-    NativeImageUtil::FreeNativeImage(&m_RenderImage);
+    NativeImageUtil::FreeNativeImage(&mRenderImage);
 }
 
 void FBOSample::Init() {
-    if (m_ProgramObj != GL_NONE) return;
-
     char vShaderStr[] =
             "#version 300 es                            \n"
-            "layout(location = 0) in vec4 a_position;   \n"
-            "layout(location = 1) in vec2 a_texCoord;   \n"
-            "out vec2 v_texCoord;                       \n"
+            "layout(location = 0) in vec4 aPosition;   \n"
+            "layout(location = 1) in vec2 aTexCoord;   \n"
+            "out vec2 vTexCoord;                       \n"
             "void main()                                \n"
             "{                                          \n"
-            "   gl_Position = a_position;               \n"
-            "   v_texCoord = a_texCoord;                \n"
+            "   gl_Position = aPosition;               \n"
+            "   vTexCoord = aTexCoord;                \n"
             "}                                          \n";
     // 用于普通渲染的片段着色器脚本，简单纹理映射
     char fShaderStr[] =
             "#version 300 es\n"
             "precision mediump float;\n"
-            "in vec2 v_texCoord;\n"
-            "layout(location = 0) out vec4 outColor;\n"
-            "uniform sampler2D s_TextureMap;\n"
+            "in vec2 vTexCoord;\n"
+            "layout(location = 0) out vec4 fragColor;\n"
+            "uniform sampler2D uTexture;\n"
             "void main()\n"
             "{\n"
-            "    outColor = texture(s_TextureMap, v_texCoord);\n"
+            "    fragColor = texture(uTexture, vTexCoord);\n"
             "}";
     // 用于离屏渲染的片段着色器脚本，取每个像素的灰度值
     char fFboShaderStr[] =
             "#version 300 es\n"
             "precision mediump float;\n"
-            "in vec2 v_texCoord;\n"
-            "layout(location = 0) out vec4 outColor;\n"
-            "uniform sampler2D s_TextureMap;\n"
+            "in vec2 vTexCoord;\n"
+            "layout(location = 0) out vec4 fragColor;\n"
+            "uniform sampler2D uTexture;\n"
             "void main()\n"
             "{\n"
-            "    vec4 tempColor = texture(s_TextureMap, v_texCoord);\n"
-            "    float luminance = tempColor.r * 0.299 + tempColor.g * 0.587 + tempColor.b * 0.114;\n"
-            "    outColor = vec4(vec3(luminance), tempColor.a);\n"
+            "    vec4 textureColor = texture(uTexture, vTexCoord);\n"
+            "    float luminance = textureColor.r * 0.299 + textureColor.g * 0.587 + textureColor.b * 0.114;\n"
+            "    fragColor = vec4(vec3(luminance), textureColor.a);\n"
             "}"; // 输出灰度图
 
-    m_ProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr, m_VertexShader, m_FragmentShader);
-    m_FboProgramObj = GLUtils::CreateProgram(vShaderStr, fFboShaderStr, m_FboVertexShader, m_FboFragmentShader);
+    mProgramObj = GLUtils::CreateProgram(vShaderStr, fShaderStr);
+    mFboProgramObj = GLUtils::CreateProgram(vShaderStr, fFboShaderStr);
 
-    if (m_ProgramObj == GL_NONE || m_FboProgramObj == GL_NONE) {
-        LOGCATE("FBOSample::Init m_ProgramObj == GL_NONE");
-        return;
-    }
+    aPositionLoc = 0;
+    aTexCoordLoc = 1;
+    uTextureLoc = glGetUniformLocation(mProgramObj, "uTexture");
 
-    m_SamplerLoc = glGetUniformLocation(m_ProgramObj, "s_TextureMap");
-    m_FboSamplerLoc = glGetUniformLocation(m_FboProgramObj, "s_TextureMap");
-
-    //顶点坐标
-    GLfloat vVertices[] = {
-            -1.0f, -1.0f, 0.0f,
-            1.0f, -1.0f, 0.0f,
-            -1.0f,  1.0f, 0.0f,
-            1.0f,  1.0f, 0.0f,
-    };
-    //正常纹理坐标
-    GLfloat vTexCoors[] = {
-            0.0f, 1.0f,
-            1.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 0.0f,
-    };
-    //fbo 纹理坐标与正常纹理方向不同，原点位于左下角
-    GLfloat vFboTexCoors[] = {
-            0.0f, 0.0f,
-            1.0f, 0.0f,
-            0.0f, 1.0f,
-            1.0f, 1.0f,
-    };
-    GLushort indices[] = { 0, 1, 2, 1, 3, 2 };
+    aFboPositionLoc = 0;
+    aFboTexCoordLoc = 1;
+    uFboTextureLoc = glGetUniformLocation(mFboProgramObj, "uTexture");
 
     // 生成 VBO
-    glGenBuffers(4, m_VboIds);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vVertices), vVertices, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vTexCoors), vTexCoors, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[2]);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vFboTexCoors), vFboTexCoors, GL_STATIC_DRAW);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[3]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glGenBuffers(4, mVboIds);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[0]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mVertexArr), mVertexArr, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mTexCoordArr), mTexCoordArr, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[2]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mFboTexCoordArr), mFboTexCoordArr, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVboIds[3]);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(mIndexArr), mIndexArr, GL_STATIC_DRAW);
 
     // 生成 VAO
-    glGenVertexArrays(2, m_VaoIds);
+    glGenVertexArrays(2, mVaoIds);
 
-    glBindVertexArray(m_VaoIds[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-    glEnableVertexAttribArray(VERTEX_POS_INDX);
-    glVertexAttribPointer(VERTEX_POS_INDX, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[1]);
-    glEnableVertexAttribArray(TEXTURE_POS_INDX);
-    glVertexAttribPointer(TEXTURE_POS_INDX, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[3]);
+    glBindVertexArray(mVaoIds[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[0]);
+    glEnableVertexAttribArray(aPositionLoc);
+    glVertexAttribPointer(aPositionLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[1]);
+    glEnableVertexAttribArray(aTexCoordLoc);
+    glVertexAttribPointer(aTexCoordLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVboIds[3]);
     glBindVertexArray(GL_NONE);
 
-    glBindVertexArray(m_VaoIds[1]);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[0]);
-    glEnableVertexAttribArray(VERTEX_POS_INDX);
-    glVertexAttribPointer(VERTEX_POS_INDX, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-    glBindBuffer(GL_ARRAY_BUFFER, m_VboIds[2]);
-    glEnableVertexAttribArray(TEXTURE_POS_INDX);
-    glVertexAttribPointer(TEXTURE_POS_INDX, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
-    glBindBuffer(GL_ARRAY_BUFFER, GL_NONE);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_VboIds[3]);
+    glBindVertexArray(mVaoIds[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[0]);
+    glEnableVertexAttribArray(aFboPositionLoc);
+    glVertexAttribPointer(aFboPositionLoc, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), nullptr);
+    glBindBuffer(GL_ARRAY_BUFFER, mVboIds[2]);
+    glEnableVertexAttribArray(aFboTexCoordLoc);
+    glVertexAttribPointer(aFboTexCoordLoc, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), nullptr);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mVboIds[3]);
     glBindVertexArray(GL_NONE);
 
     // 生成纹理
-    glGenTextures(1, &m_TextureId);
-    glBindTexture(GL_TEXTURE_2D, m_TextureId);
+    glGenTextures(1, &mImageTexture);
+    glBindTexture(GL_TEXTURE_2D, mImageTexture);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_RenderImage.ppPlane[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mRenderImage.width, mRenderImage.height, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, mRenderImage.ppPlane[0]);
     glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
     if (!CreateFrameBufferObj()) {
@@ -152,85 +144,94 @@ void FBOSample::Init() {
 }
 
 void FBOSample::Draw(int screenW, int screenH) {
-    if (m_ProgramObj == GL_NONE) return;
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glViewport(0, 0, m_RenderImage.width, m_RenderImage.height);
+//    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glViewport(0, 0, mRenderImage.width, mRenderImage.height);
 
-    glUseProgram(m_FboProgramObj);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
-    glBindVertexArray(m_VaoIds[1]);
+    glUseProgram(mFboProgramObj);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
+    glBindVertexArray(mVaoIds[1]);
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_TextureId);
-    glUniform1i(m_FboSamplerLoc, 0);
+    glBindTexture(GL_TEXTURE_2D, mImageTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mRenderImage.width, mRenderImage.height, 0,
+                 GL_RGBA, GL_UNSIGNED_BYTE, mRenderImage.ppPlane[0]);
+    glUniform1i(uFboTextureLoc, 0);
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+
+    glBindVertexArray(GL_NONE);
     glBindTexture(GL_TEXTURE_2D, GL_NONE);
-    glBindVertexArray(0);
+
+    // 通过上面的步骤，已经将数据绘制在 mFboTexture 上，可以读取里面的像素数据，也可以把该纹理显示在屏幕上
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     glViewport(0, 0, screenW, screenH);
 
-//    glBindTexture(GL_TEXTURE_2D, m_TextureId);
-//    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_RenderImage.ppPlane[0]);
-//    glBindTexture(GL_TEXTURE_2D, GL_NONE);
+    glUseProgram(mProgramObj);
 
-    glUseProgram(m_ProgramObj);
+    glBindVertexArray(mVaoIds[0]);
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_FboTextureId);
-    glUniform1i(m_SamplerLoc, 0);
-    glBindVertexArray(m_VaoIds[0]);
+    glBindTexture(GL_TEXTURE_2D, mFboTexture);
+    glUniform1i(uTextureLoc, 0);
+
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
+
     glBindVertexArray(GL_NONE);
     glBindTexture(GL_TEXTURE_2D, GL_NONE);
 }
 
-void FBOSample::Destroy() {
-    if (m_ProgramObj) {
-        glDeleteProgram(m_ProgramObj);
+void FBOSample::UnInit() {
+    if (mProgramObj) {
+        glDeleteProgram(mProgramObj);
     }
-    if (m_FboProgramObj) {
-        glDeleteProgram(m_FboProgramObj);
+    if (mFboProgramObj) {
+        glDeleteProgram(mFboProgramObj);
     }
-    if (m_TextureId) {
-        glDeleteTextures(1, &m_TextureId);
+    if (mImageTexture) {
+        glDeleteTextures(1, &mImageTexture);
     }
-    if (m_FboTextureId) {
-        glDeleteTextures(1, &m_FboTextureId);
+    if (mFboTexture) {
+        glDeleteTextures(1, &mFboTexture);
     }
-    if (m_VboIds[0]) {
-        glDeleteBuffers(4, m_VboIds);
+    if (mVboIds[0]) {
+        glDeleteBuffers(4, mVboIds);
     }
-    if (m_VaoIds[0]) {
-        glDeleteVertexArrays(2, m_VaoIds);
+    if (mVaoIds[0]) {
+        glDeleteVertexArrays(2, mVaoIds);
     }
-    if (m_FboId) {
-        glDeleteFramebuffers(1, &m_FboId);
+    if (mFboId) {
+        glDeleteFramebuffers(1, &mFboId);
     }
 }
 
-void FBOSample::LoadImage(NativeImage *pImage) {
+void FBOSample::SetImageData(NativeImage *pImage) {
     if (pImage) {
-        m_RenderImage.width = pImage->width;
-        m_RenderImage.height = pImage->height;
-        m_RenderImage.format = pImage->format;
-        NativeImageUtil::CopyNativeImage(pImage, &m_RenderImage);
+        mRenderImage.width = pImage->width;
+        mRenderImage.height = pImage->height;
+        mRenderImage.format = pImage->format;
+        NativeImageUtil::CopyNativeImage(pImage, &mRenderImage);
     }
 }
 
 bool FBOSample::CreateFrameBufferObj() {
-    glGenTextures(1, &m_FboTextureId);
-    glBindTexture(GL_TEXTURE_2D, m_FboTextureId);
+    glGenTextures(1, &mFboTexture);
+    glBindTexture(GL_TEXTURE_2D, mFboTexture);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, GL_NONE);
 
-    glGenFramebuffers(1, &m_FboId);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_FboId);
-    glBindTexture(GL_TEXTURE_2D, m_FboTextureId);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_FboTextureId, 0);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_RenderImage.width, m_RenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE,nullptr);
+    glGenFramebuffers(1, &mFboId);
+    glBindFramebuffer(GL_FRAMEBUFFER, mFboId);
+    glBindTexture(GL_TEXTURE_2D, mFboTexture);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mFboTexture, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, mRenderImage.width, mRenderImage.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         LOGCATE("FBOSample::CreateFrameBufferObj glCheckFramebufferStatus status != GL_FRAMEBUFFER_COMPLETE");
         return false;

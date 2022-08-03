@@ -17,16 +17,18 @@ public:
 
     void Draw(int screenW, int screenH) override;
 
-    void Destroy() override;
+    void UnInit() override;
 
-    void LoadImage(NativeImage *pImage) override;
+    void SetImageData(NativeImage *pImage) override;
 
 private:
-    GLuint m_yTextureId;
-    GLuint m_uvTextureId;
+    GLuint aPositionLoc;
+    GLuint aTexCoordLoc;
+    GLint uYTextureLoc;
+    GLint uUvTextureLoc;
 
-    GLint m_ySamplerLoc;
-    GLint m_uvSamplerLoc;
+    GLuint uYTexture;
+    GLuint uUvTexture;
 
     NativeImage m_RenderImage;
 };

@@ -19,7 +19,10 @@ public:
 
     virtual void Draw(int screenW, int screenH);
 
-    virtual void Destroy();
+    virtual void UnInit();
+
+private:
+    int aPositionLocation;
 };
 
 #endif //TESTOPENGL_TRIANGLESAMPLE_H
