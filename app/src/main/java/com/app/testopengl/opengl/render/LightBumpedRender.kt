@@ -9,18 +9,22 @@ import com.app.testopengl.utils.GLTexUtils
 import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
+import kotlin.math.sqrt
 
-class LightPointRender: GLSurfaceView.Renderer {
+class LightBumpedRender : GLSurfaceView.Renderer {
 
     private var mProgram = -1
 
     private val aPositionLocation = 0
     private val aTextureCoordinatesLocation = 1
     private val aNormalLocation = 2
+    private val aTangentLocation = 3
+    private val aBitangentLocation = 4
     private var uModelMatrixLocation = -1
     private var uViewMatrixLocation = -1
     private var uProjectionMatrixLocation = -1
     private var uImageTextureLocation = -1
+    private var uNormalTextureLocation = -1
     private var uLightPositionLocation = -1
     private var uViewPositionLocation = -1
     private var uLightColorLocation = -1
@@ -166,8 +170,11 @@ class LightPointRender: GLSurfaceView.Renderer {
     private lateinit var mVertexBuffer: FloatBuffer
     private lateinit var mNormalBuffer: FloatBuffer
     private lateinit var mTextureBuffer: FloatBuffer
+    private lateinit var mTangentBuffer: FloatBuffer
+    private lateinit var mBitangentBuffer: FloatBuffer
 
     private var mImageTexture = -1
+    private var mNormalTexture = -1
 
     var rotateY = 0f
     var cameraPositionX = 0f
@@ -187,12 +194,13 @@ class LightPointRender: GLSurfaceView.Renderer {
     var farPlane = 100f
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
-        mProgram = GLComUtils.createProgram(R.raw.light_point_vert_shader, R.raw.light_point_frag_shader)
+        mProgram = GLComUtils.createProgram(R.raw.light_bumped_vert_shader, R.raw.light_bumped_frag_shader)
 
         uModelMatrixLocation = GLES30.glGetUniformLocation(mProgram, "uModelMatrix")
         uViewMatrixLocation = GLES30.glGetUniformLocation(mProgram, "uViewMatrix")
         uProjectionMatrixLocation = GLES30.glGetUniformLocation(mProgram, "uProjectionMatrix")
         uImageTextureLocation = GLES30.glGetUniformLocation(mProgram, "uImageTexture")
+        uNormalTextureLocation = GLES30.glGetUniformLocation(mProgram, "uNormalTexture")
         uLightPositionLocation = GLES30.glGetUniformLocation(mProgram, "uLightPosition")
         uViewPositionLocation = GLES30.glGetUniformLocation(mProgram, "uViewPosition")
         uLightColorLocation = GLES30.glGetUniformLocation(mProgram, "uLightColor")
@@ -202,6 +210,55 @@ class LightPointRender: GLSurfaceView.Renderer {
         mTextureBuffer = GLComUtils.createFloatBuffer(mTextureArr)
 
         mImageTexture = GLTexUtils.loadTexture(R.drawable.brick)
+        mNormalTexture = GLTexUtils.loadTexture(R.drawable.brickn)
+
+        val tangentList = mutableListOf<Float>()
+        val bitangentList = mutableListOf<Float>()
+        for (i in 0 until mVertexArr.size / 9) {
+            val e1x = mVertexArr[i * 9 + 3] - mVertexArr[i * 9]
+            val e1y = mVertexArr[i * 9 + 3 + 1] - mVertexArr[i * 9 + 1]
+            val e1z = mVertexArr[i * 9 + 3 + 2] - mVertexArr[i * 9 + 2]
+            val e2x = mVertexArr[i * 9 + 6] - mVertexArr[i * 9]
+            val e2y = mVertexArr[i * 9 + 6 + 1] - mVertexArr[i * 9 + 1]
+            val e2z = mVertexArr[i * 9 + 6 + 2] - mVertexArr[i * 9 + 2]
+            val deltaUV1x = mTextureArr[i * 6 + 2] - mTextureArr[i * 6]
+            val deltaUV1y = mTextureArr[i * 6 + 2 + 1] - mTextureArr[i * 6 + 1]
+            val deltaUV2x = mTextureArr[i * 6 + 4] - mTextureArr[i * 6]
+            val deltaUV2y = mTextureArr[i * 6 + 4 + 1] - mTextureArr[i * 6 + 1]
+            val f = 1f / (deltaUV1x * deltaUV2y - deltaUV2x * deltaUV1y)
+            var tangentx = f * (deltaUV2y * e1x - deltaUV1y * e2x)
+            var tangenty = f * (deltaUV2y * e1y - deltaUV1y * e2y)
+            var tangentz = f * (deltaUV2y * e1z - deltaUV1y * e2z)
+            val tangentLength = sqrt(tangentx * tangentx + tangenty * tangenty + tangentz * tangentz)
+            tangentx /= tangentLength
+            tangenty /= tangentLength
+            tangentz /= tangentLength
+            var bitangentx = f * (-deltaUV2x * e1x + deltaUV1x * e2x)
+            var bitangenty = f * (-deltaUV2x * e1y + deltaUV1x * e2y)
+            var bitangentz = f * (-deltaUV2x * e1z + deltaUV1x * e2z)
+            val bitangentLength = sqrt(bitangentx * bitangentx + bitangenty * bitangenty + bitangentz * bitangentz)
+            bitangentx /= bitangentLength
+            bitangenty /= bitangentLength
+            bitangentz /= bitangentLength
+            for (j in 0 until 9) {
+                when (j % 3) {
+                    0 -> {
+                        tangentList.add(tangentx)
+                        bitangentList.add(bitangentx)
+                    }
+                    1 -> {
+                        tangentList.add(tangenty)
+                        bitangentList.add(bitangenty)
+                    }
+                    2 -> {
+                        tangentList.add(tangentz)
+                        bitangentList.add(bitangentz)
+                    }
+                }
+            }
+        }
+        mTangentBuffer = GLComUtils.createFloatBuffer(tangentList.toFloatArray())
+        mBitangentBuffer = GLComUtils.createFloatBuffer(bitangentList.toFloatArray())
     }
 
     override fun onSurfaceChanged(gl: GL10, width: Int, height: Int) {
@@ -226,6 +283,10 @@ class LightPointRender: GLSurfaceView.Renderer {
         GLES30.glVertexAttribPointer(aTextureCoordinatesLocation, 2, GLES30.GL_FLOAT, false, 0, mTextureBuffer)
         GLES30.glEnableVertexAttribArray(aNormalLocation)
         GLES30.glVertexAttribPointer(aNormalLocation, 3, GLES30.GL_FLOAT, false, 0, mNormalBuffer)
+        GLES30.glEnableVertexAttribArray(aTangentLocation)
+        GLES30.glVertexAttribPointer(aTangentLocation, 3, GLES30.GL_FLOAT, false, 0, mTangentBuffer)
+        GLES30.glEnableVertexAttribArray(aBitangentLocation)
+        GLES30.glVertexAttribPointer(aBitangentLocation, 3, GLES30.GL_FLOAT, false, 0, mBitangentBuffer)
 
         val modelMatrix = GLComUtils.getIdentity()
         val viewMatrix = GLComUtils.getIdentity()
@@ -243,7 +304,11 @@ class LightPointRender: GLSurfaceView.Renderer {
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0)
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, mImageTexture)
         GLES30.glUniform1i(uImageTextureLocation, 0)
-        GLES30.glUniform3f(uLightPositionLocation, 5f, 0f, 0f)
+        GLES30.glActiveTexture(GLES30.GL_TEXTURE1)
+        GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, mNormalTexture)
+        GLES30.glUniform1i(uNormalTextureLocation, 1)
+
+        GLES30.glUniform3f(uLightPositionLocation, 2f, 0f, 2f)
         GLES30.glUniform3f(uViewPositionLocation, 0f, 0f, 5f)
         GLES30.glUniform3f(uLightColorLocation, 1f, 1f, 1f)
 

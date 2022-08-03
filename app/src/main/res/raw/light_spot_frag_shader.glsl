@@ -27,27 +27,35 @@ void main() {
     // 漫反射光
     vec3 normal = normalize(vNormal);
     vec3 lightDir = normalize(uLightPosition - vPosition);
-    float diff = max(dot(normal, lightDir), 0.0);
-    vec3 diffuse = diff * uLightColor;
+    float diffuseTheta = max(dot(normal, lightDir), 0.0);
+    vec3 diffuse = diffuseTheta * uLightColor;
 
     // 镜面光
     float specularStrength = 2.0;
     vec3 viewDir = normalize(uViewPosition - vPosition);
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = myPow(max(dot(viewDir, reflectDir), 0.0), 16);
-    vec3 specular = specularStrength * spec * uLightColor;
+    float specularTheta = myPow(max(dot(viewDir, reflectDir), 0.0), 16);
+    vec3 specular = specularStrength * specularTheta * uLightColor;
+
+    // 聚光 (柔边)
+    vec3 spotPosition = vec3(-2.0, 0.0, 0.0);
+    vec3 spotDir = normalize(-spotPosition);
+    float spotTheta = dot(lightDir, spotDir);
+    float epsilon = 0.15;
+    float intensity = clamp((spotTheta - 0.85) / epsilon, 0.0, 1.0);
+    diffuse *= intensity;
+    specular *= intensity;
 
     // 光源衰减
     float dist = length(uLightPosition - vPosition);
     float kc = 0.1;
-    float kl = 0.05;
-    float kq = 0.05;
+    float kl = 0.1;
+    float kq = 0.1;
     float attenuation = 1.0 / (kc + kl * dist + kq * dist * dist);
-    ambient = attenuation * ambient;
-    diffuse = attenuation * diffuse;
-    specular = attenuation * specular;
+    ambient *= attenuation;
+    diffuse *= attenuation;
+    specular *= attenuation;
 
     vec3 finalColor = (ambient + diffuse + specular) * imageTexColor;
     fragColor = vec4(finalColor, 1.0);
-
 }

@@ -24,7 +24,6 @@ class LightDirectionRender: GLSurfaceView.Renderer {
     private var uLightDirectionLocation = -1
     private var uViewPositionLocation = -1
     private var uLightColorLocation = -1
-    private var uObjectColorLocation = -1
 
     private val mVertexArr = floatArrayOf(
         // 正面
@@ -197,7 +196,6 @@ class LightDirectionRender: GLSurfaceView.Renderer {
         uLightDirectionLocation = GLES30.glGetUniformLocation(mProgram, "uLightDirection")
         uViewPositionLocation = GLES30.glGetUniformLocation(mProgram, "uViewPosition")
         uLightColorLocation = GLES30.glGetUniformLocation(mProgram, "uLightColor")
-        uObjectColorLocation = GLES30.glGetUniformLocation(mProgram, "uObjectColor")
 
         mVertexBuffer = GLComUtils.createFloatBuffer(mVertexArr)
         mNormalBuffer = GLComUtils.createFloatBuffer(mNormalArr)
@@ -248,7 +246,6 @@ class LightDirectionRender: GLSurfaceView.Renderer {
         GLES30.glUniform3f(uLightDirectionLocation, -5f, 0f, 0f)
         GLES30.glUniform3f(uViewPositionLocation, 0f, 0f, 5f)
         GLES30.glUniform3f(uLightColorLocation, 1f, 1f, 1f)
-        GLES30.glUniform3f(uObjectColorLocation, 1f, 1f, 0f)
 
         GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, mVertexArr.size / 3)
     }

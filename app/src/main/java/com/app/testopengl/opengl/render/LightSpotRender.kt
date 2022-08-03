@@ -10,7 +10,7 @@ import java.nio.FloatBuffer
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-class LightPointRender: GLSurfaceView.Renderer {
+class LightSpotRender : GLSurfaceView.Renderer {
 
     private var mProgram = -1
 
@@ -187,7 +187,7 @@ class LightPointRender: GLSurfaceView.Renderer {
     var farPlane = 100f
 
     override fun onSurfaceCreated(gl: GL10, config: EGLConfig) {
-        mProgram = GLComUtils.createProgram(R.raw.light_point_vert_shader, R.raw.light_point_frag_shader)
+        mProgram = GLComUtils.createProgram(R.raw.light_spot_vert_shader, R.raw.light_spot_frag_shader)
 
         uModelMatrixLocation = GLES30.glGetUniformLocation(mProgram, "uModelMatrix")
         uViewMatrixLocation = GLES30.glGetUniformLocation(mProgram, "uViewMatrix")
@@ -243,7 +243,7 @@ class LightPointRender: GLSurfaceView.Renderer {
         GLES30.glActiveTexture(GLES30.GL_TEXTURE0)
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, mImageTexture)
         GLES30.glUniform1i(uImageTextureLocation, 0)
-        GLES30.glUniform3f(uLightPositionLocation, 5f, 0f, 0f)
+        GLES30.glUniform3f(uLightPositionLocation, 2f, 0f, 0f)
         GLES30.glUniform3f(uViewPositionLocation, 0f, 0f, 5f)
         GLES30.glUniform3f(uLightColorLocation, 1f, 1f, 1f)
 

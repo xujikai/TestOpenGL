@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.Intent
 import com.app.testopengl.R
 import com.app.testopengl.base.BaseActivity
-import com.app.testopengl.opengl.render.LightDirectionRender
-import com.app.testopengl.opengl.render.LightPointRender
-import com.app.testopengl.opengl.render.MRTRender
-import com.app.testopengl.opengl.render.VBORender
+import com.app.testopengl.opengl.render.*
 import kotlinx.android.synthetic.main.activity_basic_shape.*
 
 /**
@@ -30,7 +27,9 @@ class BasicShape3Activity: BaseActivity() {
 //        glSurface.setRenderer(VBORender())
 //        glSurface.setRenderer(MRTRender())
 //        glSurface.setRenderer(LightDirectionRender())
-        glSurface.setRenderer(LightPointRender())
+//        glSurface.setRenderer(LightPointRender())
+//        glSurface.setRenderer(LightSpotRender())
+        glSurface.setRenderer(LightBumpedRender())
     }
 
 }
