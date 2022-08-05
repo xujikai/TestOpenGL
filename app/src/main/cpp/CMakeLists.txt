@@ -15,6 +15,7 @@ set(jnilibs ${CMAKE_SOURCE_DIR}/../jniLibs)
 include_directories(
         glm
         include
+        opencv_3_0_0
 )
 
 link_directories(${jnilibs}/${ANDROID_ABI})
@@ -25,7 +26,8 @@ file(GLOB src-files
         ${CMAKE_SOURCE_DIR}/util/*.cpp
         ${CMAKE_SOURCE_DIR}/sample/*.cpp
         ${CMAKE_SOURCE_DIR}/recorder/*.cpp
-        ${CMAKE_SOURCE_DIR}/context/*.cpp)
+        ${CMAKE_SOURCE_DIR}/context/*.cpp
+        ${CMAKE_SOURCE_DIR}/model/*.cpp)
 
 add_library( # Sets the name of the library.
         native-render
@@ -49,6 +51,12 @@ find_library( # Sets the name of the path variable.
               # you want CMake to locate.
               log )
 
+#add_library(include.assimp SHARED IMPORTED )
+#set_target_properties(include.assimp PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libassimp.so)
+#
+#add_library(freetype STATIC IMPORTED )
+#set_target_properties(freetype PROPERTIES IMPORTED_LOCATION ${jnilibs}/${ANDROID_ABI}/libfreetype.a)
+
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
@@ -62,6 +70,8 @@ set(third-party-libs
         avutil
         fdk-aac
         x264
+        assimp
+        opencv_java3
         )
 
 set(native-libs

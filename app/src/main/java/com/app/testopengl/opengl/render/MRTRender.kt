@@ -54,9 +54,14 @@ class MRTRender: GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10) {
-        GLES30.glClearColor(0f, 0f, 0f,0f)
-        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)
+        GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, mFbo)
 
+//        离屏渲染的窗口大小
+//        GLES30.glViewport(0, 0, mImageWidth, mImageHeight);
+        GLES30.glClearColor(1f, 1f, 1f,1f)
+        GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)
+//        确定绘制到哪些 GLES30.GL_COLOR_ATTACHMENT 上
+//        GLES30.glDrawBuffers(attachmentArr.size, attachmentBuffer)
         GLES30.glUseProgram(mProgramMrt)
 
         GLES30.glEnableVertexAttribArray(0)
@@ -68,16 +73,15 @@ class MRTRender: GLSurfaceView.Renderer {
         GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, mImageTexture)
         GLES30.glUniform1i(uTextureMrtLocation, 0)
 
-        GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, mFbo)
-
         GLES30.glDrawArrays(GLES30.GL_TRIANGLES, 0, 6)
-
-        GLES30.glUseProgram(mProgram)
 
         GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0)
 
+//        屏幕的窗口大小
+//        GLES30.glViewport(0, 0, mScreenWidth, mScreenHeight);
         GLES30.glClearColor(1f, 1f, 1f,1f)
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT)
+        GLES30.glUseProgram(mProgram)
 
         // 将三个纹理分别绘制出来
         for (i in mFboTextureArr.indices) {

@@ -59,9 +59,12 @@ class FBORender: GLSurfaceView.Renderer {
     }
 
     override fun onDrawFrame(gl: GL10) {
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBuffer)
+
+//        离屏渲染的窗口大小
+//        GLES30.glViewport(0, 0, mImageWidth, mImageHeight);
         GLES20.glClearColor(0f, 0f, 0f, 1f)
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-
         GLES20.glUseProgram(mProgram0)
 
         GLES20.glEnableVertexAttribArray(aPosition0Location)
@@ -73,10 +76,14 @@ class FBORender: GLSurfaceView.Renderer {
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mImageTexture)
         GLES20.glUniform1i(uTexture0Location, 0)
 
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBuffer)
-
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6)
 
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
+
+//        屏幕的窗口大小
+//        GLES30.glViewport(0, 0, mScreenWidth, mScreenHeight);
+        GLES20.glClearColor(0f, 0f, 0f, 1f)
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
         GLES20.glUseProgram(mProgram1)
 
         GLES20.glEnableVertexAttribArray(aPosition1Location)
@@ -87,8 +94,6 @@ class FBORender: GLSurfaceView.Renderer {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mFrameBufferTexture)
         GLES20.glUniform1i(uTexture1Location, 0)
-
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 6)
     }
