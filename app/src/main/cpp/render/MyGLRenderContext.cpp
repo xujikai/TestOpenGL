@@ -10,6 +10,7 @@
 #include "../sample/FBOSample.h"
 #include "../sample/CoordSystemSample.h"
 #include "../sample/ModelObjSample.h"
+#include "../sample/PBOSample.h"
 #include <GLES3/gl3.h>
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
@@ -21,7 +22,8 @@ MyGLRenderContext::MyGLRenderContext() {
 //    m_pSample = new VAOSample();
 //    m_pSample = new FBOSample();
 //    m_pSample = new CoordSystemSample();
-    m_pSample = new ModelObjSample();
+//    m_pSample = new ModelObjSample();
+    m_pSample = new PBOSample();
 }
 
 MyGLRenderContext::~MyGLRenderContext() {

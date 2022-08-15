@@ -11,11 +11,7 @@
 
 class GLSampleBase {
 public:
-    GLSampleBase() {
-        mProgramObj = GL_NONE;
-        mSurfaceWidth = 0;
-        mSurfaceHeight = 0;
-    };
+    GLSampleBase() {};
     virtual ~GLSampleBase() {};
 
     virtual void Init() = 0;
@@ -28,9 +24,9 @@ public:
 
     virtual void UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {};
 protected:
-    GLuint mProgramObj;
-    int mSurfaceWidth;
-    int mSurfaceHeight;
+    GLuint mProgramObj = GL_NONE;
+    int mSurfaceWidth = 0;
+    int mSurfaceHeight = 0;
 };
 
 #endif //TESTOPENGL_GLSAMPLEBASE_H
