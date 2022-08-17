@@ -11,6 +11,7 @@
 #include "../sample/CoordSystemSample.h"
 #include "../sample/ModelObjSample.h"
 #include "../sample/PBOSample.h"
+#include "../sample/BeatHeartSample.h"
 #include <GLES3/gl3.h>
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
@@ -23,7 +24,8 @@ MyGLRenderContext::MyGLRenderContext() {
 //    m_pSample = new FBOSample();
 //    m_pSample = new CoordSystemSample();
 //    m_pSample = new ModelObjSample();
-    m_pSample = new PBOSample();
+//    m_pSample = new PBOSample();
+    m_pSample = new BeatHeartSample();
 }
 
 MyGLRenderContext::~MyGLRenderContext() {
