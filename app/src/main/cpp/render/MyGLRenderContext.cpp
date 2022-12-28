@@ -13,6 +13,7 @@
 #include "../sample/PBOSample.h"
 #include "../sample/BeatHeartSample.h"
 #include "../sample/BlitSample.h"
+#include "../sample/AvatarSample.h"
 #include <GLES3/gl3.h>
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
@@ -27,7 +28,8 @@ MyGLRenderContext::MyGLRenderContext() {
 //    m_pSample = new ModelObjSample();
 //    m_pSample = new PBOSample();
 //    m_pSample = new BeatHeartSample();
-    m_pSample = new BlitSample();
+//    m_pSample = new BlitSample();
+    m_pSample = new AvatarSample();
 }
 
 MyGLRenderContext::~MyGLRenderContext() {
@@ -78,6 +80,32 @@ void MyGLRenderContext::SetImageData(int format, int width, int height, uint8_t 
 
     if (m_pSample) {
         m_pSample->SetImageData(&nativeImage);
+    }
+}
+
+void MyGLRenderContext::SetImageDataWithIndex(int index, int format, int width, int height,
+                                              uint8_t *pData) {
+    NativeImage nativeImage;
+    nativeImage.width = width;
+    nativeImage.height = height;
+    nativeImage.format = format;
+    nativeImage.ppPlane[0] = pData;
+
+    switch (format) {
+        case IMAGE_FORMAT_NV12:
+        case IMAGE_FORMAT_NV21:
+            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            break;
+        case IMAGE_FORMAT_I420:
+            nativeImage.ppPlane[1] = nativeImage.ppPlane[0] + width * height;
+            nativeImage.ppPlane[2] = nativeImage.ppPlane[1] + width * height / 4;
+            break;
+        default:
+            break;
+    }
+
+    if (m_pSample) {
+        m_pSample->SetImageDataWithIndex(index, &nativeImage);
     }
 }
 

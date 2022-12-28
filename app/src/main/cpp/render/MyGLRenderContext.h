@@ -21,6 +21,8 @@ public:
 
     void SetImageData(int format, int width, int height, uint8_t *pData);
 
+    void SetImageDataWithIndex(int index, int format, int width, int height, uint8_t *pData);
+
     static MyGLRenderContext* GetInstance();
 
     static void DestroyInstance();

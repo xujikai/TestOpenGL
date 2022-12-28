@@ -33,8 +33,15 @@ class BasicShapeNativeActivity: BaseActivity() {
 
     override fun initData() {
         mGLRender.init()
-        loadRGBAImage(R.drawable.texture)
+//        loadRGBAImage(R.drawable.texture)
 //        loadNV21Image("YUV_Image_840x1074.NV21")
+//        loadRGBAImage(R.drawable.board_texture, 0)
+//        loadRGBAImage(R.drawable.floor, 1)
+//        loadRGBAImage(R.drawable.window, 2)
+        // 3D头像
+        loadRGBAImage(R.drawable.avatar_a, 0)
+        loadRGBAImage(R.drawable.avatar_b, 1)
+        loadRGBAImage(R.drawable.avatar_c, 2)
         glSurface.setEGLContextClientVersion(3)
         glSurface.setRenderer(mGLRender)
     }
@@ -61,6 +68,15 @@ class BasicShapeNativeActivity: BaseActivity() {
         val buf = ByteBuffer.allocate(bitmap.byteCount)
         bitmap.copyPixelsToBuffer(buf)
         mGLRender.setImageData(IMAGE_FORMAT_RGBA, bitmap.width, bitmap.height, buf.array())
+        inputStream.close()
+    }
+
+    private fun loadRGBAImage(resId: Int, index: Int) {
+        val inputStream = resources.openRawResource(resId)
+        val bitmap: Bitmap = BitmapFactory.decodeStream(inputStream)
+        val buf = ByteBuffer.allocate(bitmap.byteCount)
+        bitmap.copyPixelsToBuffer(buf)
+        mGLRender.setImageDataWithIndex(index, IMAGE_FORMAT_RGBA, bitmap.width, bitmap.height, buf.array())
         inputStream.close()
     }
 

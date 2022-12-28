@@ -36,6 +36,10 @@ class MyGLRender: GLSurfaceView.Renderer {
         nativeSetImageData(format, width, height, bytes)
     }
 
+    fun setImageDataWithIndex(index: Int, format: Int, width: Int, height: Int, bytes: ByteArray) {
+        nativeSetImageDataWithIndex(index, format, width, height, bytes)
+    }
+
     private external fun nativeInit()
 
     private external fun nativeUnInit()
@@ -47,5 +51,7 @@ class MyGLRender: GLSurfaceView.Renderer {
     private external fun nativeOnDrawFrame()
 
     private external fun nativeSetImageData(format: Int, width: Int, height: Int, bytes: ByteArray)
+
+    private external fun nativeSetImageDataWithIndex(index: Int, format: Int, width: Int, height: Int, bytes: ByteArray)
 
 }

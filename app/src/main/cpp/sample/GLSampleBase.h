@@ -22,6 +22,8 @@ public:
 
     virtual void SetImageData(NativeImage *pImage) {};
 
+    virtual void SetImageDataWithIndex(int index, NativeImage *pImage) {};
+
     virtual void UpdateTransformMatrix(float rotateX, float rotateY, float scaleX, float scaleY) {};
 protected:
     GLuint mProgramObj = GL_NONE;

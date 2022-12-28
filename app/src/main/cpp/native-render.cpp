@@ -40,3 +40,16 @@ Java_com_app_testopengl_opengl_MyGLRender_nativeSetImageData(JNIEnv *env, jobjec
     delete[] buf;
     env->DeleteLocalRef(imageData);
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_app_testopengl_opengl_MyGLRender_nativeSetImageDataWithIndex(JNIEnv *env, jobject thiz,
+                                                                      jint index, jint format,
+                                                                      jint width, jint height,
+                                                                      jbyteArray imageData) {
+    int len = env->GetArrayLength(imageData);
+    uint8_t *buf = new uint8_t[len];
+    env->GetByteArrayRegion(imageData, 0, len, reinterpret_cast<jbyte *>(buf));
+    MyGLRenderContext::GetInstance()->SetImageDataWithIndex(index, format, width, height, buf);
+    delete[] buf;
+    env->DeleteLocalRef(imageData);
+}
