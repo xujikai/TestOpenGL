@@ -14,6 +14,7 @@
 #include "../sample/BeatHeartSample.h"
 #include "../sample/BlitSample.h"
 #include "../sample/AvatarSample.h"
+#include "../sample/WaterRippleSample.h"
 #include <GLES3/gl3.h>
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
@@ -29,7 +30,8 @@ MyGLRenderContext::MyGLRenderContext() {
 //    m_pSample = new PBOSample();
 //    m_pSample = new BeatHeartSample();
 //    m_pSample = new BlitSample();
-    m_pSample = new AvatarSample();
+//    m_pSample = new AvatarSample();
+    m_pSample = new WaterRippleSample();
 }
 
 MyGLRenderContext::~MyGLRenderContext() {
