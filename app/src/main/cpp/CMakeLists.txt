@@ -16,6 +16,7 @@ include_directories(
         glm
         include
         opencv_3_0_0
+        include/freetype_2_9_1
 )
 
 link_directories(${jnilibs}/${ANDROID_ABI})
@@ -72,6 +73,7 @@ set(third-party-libs
         x264
         assimp
         opencv_java3
+        freetype
         )
 
 set(native-libs
