@@ -42,6 +42,12 @@ class BasicShapeNativeActivity: BaseActivity() {
 //        loadRGBAImage(R.drawable.avatar_a, 0)
 //        loadRGBAImage(R.drawable.avatar_b, 1)
 //        loadRGBAImage(R.drawable.avatar_c, 2)
+        // 转场特效
+        loadRGBAImage(R.drawable.lye1, 0)
+        loadRGBAImage(R.drawable.lye2, 1)
+        loadRGBAImage(R.drawable.lye3, 2)
+        loadRGBAImage(R.drawable.lye4, 3)
+        loadRGBAImage(R.drawable.lye5, 4)
         glSurface.setEGLContextClientVersion(3)
         glSurface.setRenderer(mGLRender)
     }

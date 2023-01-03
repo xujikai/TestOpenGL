@@ -8,7 +8,7 @@
 #include "./GLSampleBase.h"
 #include <gtc/matrix_transform.hpp>
 
-static const int RENDER_IMG_NUM = 3;
+#define RENDER_IMG_NUM 3
 
 class AvatarSample : public GLSampleBase {
 public:

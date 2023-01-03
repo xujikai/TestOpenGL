@@ -16,6 +16,10 @@
 #include "../sample/AvatarSample.h"
 #include "../sample/WaterRippleSample.h"
 #include "../sample/TextRenderSample.h"
+#include "../sample/Transition01Sample.h"
+#include "../sample/Transition02Sample.h"
+#include "../sample/Transition03Sample.h"
+#include "../sample/Transition04Sample.h"
 #include <GLES3/gl3.h>
 
 MyGLRenderContext* MyGLRenderContext::m_pContext = nullptr;
@@ -33,7 +37,11 @@ MyGLRenderContext::MyGLRenderContext() {
 //    m_pSample = new BlitSample();
 //    m_pSample = new AvatarSample();
 //    m_pSample = new WaterRippleSample();
-    m_pSample = new TextRenderSample();
+//    m_pSample = new TextRenderSample();
+//    m_pSample = new Transition01Sample();
+//    m_pSample = new Transition02Sample();
+//    m_pSample = new Transition03Sample();
+    m_pSample = new Transition04Sample();
 }
 
 MyGLRenderContext::~MyGLRenderContext() {
