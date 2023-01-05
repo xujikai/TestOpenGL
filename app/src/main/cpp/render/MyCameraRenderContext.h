@@ -27,6 +27,8 @@ public:
 
     void SetTransformMatrix(float translateX, float translateY, float scaleX, float scaleY, int degree, int mirror);
 
+    void LoadShaderStr(int shaderIndex, char *pShaderStr, int strLen);
+
     static MyCameraRenderContext* GetInstance();
 
     static void DestroyInstance();

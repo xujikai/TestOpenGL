@@ -69,3 +69,16 @@ Java_com_app_testopengl_opengl_MyNativeCameraRender_nativeSetTransformMatrix(JNI
                                                                              jint mirror) {
     MyCameraRenderContext::GetInstance()->SetTransformMatrix(translate_x, translate_y, scale_x, scale_y, degree, mirror);
 }
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_app_testopengl_opengl_MyNativeCameraRender_nativeLoadShaderStr(JNIEnv *env, jobject thiz,
+                                                                        jint shader_index,
+                                                                        jstring shader_str) {
+    int len = env->GetStringUTFLength(shader_str);
+    char *pShaderStr = new char[len];
+    env->GetStringUTFRegion(shader_str, 0, len, pShaderStr);
+//    LOGCATE("content: %s", pShaderStr);
+    MyCameraRenderContext::GetInstance()->LoadShaderStr(shader_index, pShaderStr, len);
+    env->ReleaseStringUTFChars(shader_str, pShaderStr);
+    delete[] pShaderStr;
+}

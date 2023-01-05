@@ -7,6 +7,7 @@ import android.opengl.GLSurfaceView
 import android.util.Size
 import android.view.ViewTreeObserver.OnPreDrawListener
 import android.widget.RelativeLayout
+import androidx.appcompat.widget.AppCompatButton
 import com.app.testopengl.R
 import com.app.testopengl.base.BaseActivity
 import com.app.testopengl.camera.Camera2FrameCallback
@@ -24,6 +25,10 @@ class CameraActivity: BaseActivity(), Camera2FrameCallback {
 
     lateinit var mCameraRender: MyCameraRender
     lateinit var mCamera2Wrapper: Camera2Wrapper
+
+    private var mCurShaderIndex = 0
+    private val MIN_SHADER_INDEX = 0
+    private val MAX_SHADER_INDEX = 4
 
     companion object {
         fun start(context: Context) {
@@ -56,6 +61,21 @@ class CameraActivity: BaseActivity(), Camera2FrameCallback {
                 return true
             }
         })
+
+        findViewById<AppCompatButton>(R.id.btnPrev).setOnClickListener {
+            mCurShaderIndex--
+            if (mCurShaderIndex < MIN_SHADER_INDEX) {
+                mCurShaderIndex = MAX_SHADER_INDEX
+            }
+            mCameraRender.loadShaderFromAssets(mCurShaderIndex)
+        }
+        findViewById<AppCompatButton>(R.id.btnNext).setOnClickListener {
+            mCurShaderIndex++
+            if (mCurShaderIndex > MAX_SHADER_INDEX) {
+                mCurShaderIndex = MIN_SHADER_INDEX
+            }
+            mCameraRender.loadShaderFromAssets(mCurShaderIndex)
+        }
     }
 
     override fun onResume() {
@@ -76,7 +96,7 @@ class CameraActivity: BaseActivity(), Camera2FrameCallback {
     }
 
     override fun onPreviewFrame(data: ByteArray, width: Int, height: Int) {
-        LogUtils.i("$width $height")
+//        LogUtils.i("$width $height")
         mCameraRender.setRenderFrame(RenderCons.IMAGE_FORMAT_I420, width, height, data)
         mCameraRender.requestRender()
     }

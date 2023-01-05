@@ -26,4 +26,6 @@ class MyNativeCameraRender {
 
     external fun nativeSetTransformMatrix(translateX: Float, translateY: Float, scaleX: Float, scaleY: Float, degree: Int, mirror: Int)
 
+    external fun nativeLoadShaderStr(shaderIndex: Int, shaderStr: String)
+
 }

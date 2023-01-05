@@ -4,16 +4,18 @@
 
 #include "MyCameraRenderContext.h"
 #include "../sample/Camera01Sample.h"
+#include "../sample/Camera02Sample.h"
 
 MyCameraRenderContext *MyCameraRenderContext::m_pContext = nullptr;
 
 MyCameraRenderContext::MyCameraRenderContext() {
-    m_pSample = new Camera01Sample();
+//    m_pSample = new Camera01Sample();
+    m_pSample = new Camera02Sample();
 }
 
 MyCameraRenderContext::~MyCameraRenderContext() {
     if (m_pSample) {
-//        delete m_pSample;
+        delete m_pSample;
         m_pSample = nullptr;
     }
 }
@@ -64,6 +66,10 @@ void MyCameraRenderContext::UpdateFrame(int format, int width, int height, uint8
 void MyCameraRenderContext::SetTransformMatrix(float translateX, float translateY, float scaleX,
                                                float scaleY, int degree, int mirror) {
     m_pSample->SetTransformMatrix(translateX, translateY, scaleX, scaleY, degree, mirror);
+}
+
+void MyCameraRenderContext::LoadShaderStr(int shaderIndex, char *pShaderStr, int strLen) {
+    m_pSample->LoadShaderStr(shaderIndex, pShaderStr, strLen);
 }
 
 MyCameraRenderContext *MyCameraRenderContext::GetInstance() {

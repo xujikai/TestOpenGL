@@ -50,6 +50,7 @@ private:
     GLuint m_YTextureId;
     GLuint m_UTextureId;
     GLuint m_VTextureId;
+    NativeImage m_RenderImage;
 
     GLuint m_VertexCoorHandle;
     GLuint m_TextureCoorHandle;

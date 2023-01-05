@@ -1,6 +1,7 @@
 package com.app.testopengl.opengl
 
 import android.opengl.GLSurfaceView
+import com.blankj.utilcode.util.ResourceUtils
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -23,7 +24,7 @@ class MyCameraRender: GLSurfaceView.Renderer {
 
     fun init(surfaceView: GLSurfaceView) {
         mGLSurfaceView = surfaceView
-        mGLSurfaceView.setEGLContextClientVersion(2)
+        mGLSurfaceView.setEGLContextClientVersion(3)
         mGLSurfaceView.setRenderer(this)
         mGLSurfaceView.renderMode = GLSurfaceView.RENDERMODE_WHEN_DIRTY
 
@@ -46,5 +47,10 @@ class MyCameraRender: GLSurfaceView.Renderer {
 
     fun setTransformMatrix(translateX: Float, translateY: Float, scaleX: Float, scaleY: Float, degree: Int, mirror: Int) {
         mNativeRender.nativeSetTransformMatrix(translateX, translateY, scaleX, scaleY, degree, mirror)
+    }
+
+    fun loadShaderFromAssets(shaderIndex: Int) {
+        mNativeRender.nativeLoadShaderStr(shaderIndex, ResourceUtils.readAssets2String("shaders/fshader_$shaderIndex.frag"))
+//        mNativeRender.nativeLoadShaderStr(shaderIndex, "hello world\nhello android")
     }
 }
