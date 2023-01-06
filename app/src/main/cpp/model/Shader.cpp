@@ -4,7 +4,7 @@
 
 #include "Shader.h"
 
-Shader::Shader(char *vertShader, char *fragShader) {
+Shader::Shader(const char *vertShader, const char *fragShader) {
     program = GLUtils::CreateProgram(vertShader, fragShader);
 }
 

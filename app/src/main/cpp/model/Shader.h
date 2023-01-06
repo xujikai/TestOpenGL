@@ -13,7 +13,7 @@ class Shader {
 public:
     unsigned int program;
 
-    Shader(char *vertShader, char *fragShader);
+    Shader(const char *vertShader, const char *fragShader);
 
     void Destroy();
 

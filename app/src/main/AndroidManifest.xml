@@ -54,6 +54,9 @@
         <activity
             android:name=".ui.activity.ModelRenderActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.activity.RealViewActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

@@ -48,5 +48,8 @@ class MainActivity : BaseActivity() {
         btnModelRender.setOnClickListener {
             ModelRenderActivity.start(mContext)
         }
+        btnBusiness1.setOnClickListener {
+            RealViewActivity.start(mContext)
+        }
     }
 }
