@@ -30,7 +30,7 @@
 #define IMAGE_FORMAT_I444_EXT       "I444"
 #define IMAGE_FORMAT_P010_EXT       "P010" //16bit NV21
 
-struct NativeImage {
+typedef struct NativeImage {
     int width;
     int height;
     int format;
@@ -48,7 +48,7 @@ struct NativeImage {
         pLineSize[1] = 0;
         pLineSize[2] = 0;
     }
-};
+} NativeImage;
 
 class NativeImageUtil {
 public:
@@ -122,8 +122,8 @@ public:
 
     static void CopyNativeImage(NativeImage *pSrcImg, NativeImage *pDstImg) {
         if (pSrcImg == nullptr || pSrcImg->ppPlane[0] == nullptr) return;
-        LOGCATE("NativeImageUtil::CopyNativeImage src[w,h,format]=[%d, %d, %d], dst[w,h,format]=[%d, %d, %d]", pSrcImg->width, pSrcImg->height, pSrcImg->format, pDstImg->width, pDstImg->height, pDstImg->format);
-        LOGCATE("NativeImageUtil::CopyNativeImage src[line0,line1,line2]=[%d, %d, %d], dst[line0,line1,line2]=[%d, %d, %d]", pSrcImg->pLineSize[0], pSrcImg->pLineSize[1], pSrcImg->pLineSize[2], pDstImg->pLineSize[0], pDstImg->pLineSize[1], pDstImg->pLineSize[2]);
+//        LOGCATE("NativeImageUtil::CopyNativeImage src[w,h,format]=[%d, %d, %d], dst[w,h,format]=[%d, %d, %d]", pSrcImg->width, pSrcImg->height, pSrcImg->format, pDstImg->width, pDstImg->height, pDstImg->format);
+//        LOGCATE("NativeImageUtil::CopyNativeImage src[line0,line1,line2]=[%d, %d, %d], dst[line0,line1,line2]=[%d, %d, %d]", pSrcImg->pLineSize[0], pSrcImg->pLineSize[1], pSrcImg->pLineSize[2], pDstImg->pLineSize[0], pDstImg->pLineSize[1], pDstImg->pLineSize[2]);
 
         if (pSrcImg->format != pDstImg->format ||
             pSrcImg->width != pDstImg->width ||

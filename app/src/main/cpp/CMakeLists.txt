@@ -28,6 +28,8 @@ file(GLOB src-files
         ${CMAKE_SOURCE_DIR}/sample/*.cpp
         ${CMAKE_SOURCE_DIR}/recorder/*.cpp
         ${CMAKE_SOURCE_DIR}/context/*.cpp
+        ${CMAKE_SOURCE_DIR}/player/*.cpp
+        ${CMAKE_SOURCE_DIR}/player/decoder/*.cpp
         ${CMAKE_SOURCE_DIR}/model/*.cpp)
 
 add_library( # Sets the name of the library.
